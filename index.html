@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OrientIA MTL</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #E8F4FD;
+  --bg2:      #D0E8F8;
+  --white:    #FFFFFF;
+  --blue:     #1976D2;
+  --blue-d:   #1565C0;
+  --blue-dp:  #0D47A1;
+  --blue-l:   #EBF5FB;
+  --blue-m:   #BBDEFB;
+  --text:     #0D1B2A;
+  --muted:    #546E7A;
+  --border:   #90CAF9;
+  --border2:  #BBDEFB;
+  --red:      #C62828; --red-bg: #FFEBEE;
+  --orange:   #E65100; --orange-bg: #FFF3E0;
+  --green:    #2E7D32; --green-bg: #E8F5E9;
+  --yellow:   #F57F17; --yellow-bg:#FFFDE7;
+  --r:        14px;
+  --shadow:   0 2px 8px rgba(13,71,161,.10);
+  --shadow-m: 0 4px 16px rgba(13,71,161,.18);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:linear-gradient(160deg,var(--bg) 0%,var(--bg2) 100%);min-height:100vh;color:var(--text);display:flex;flex-direction:column;align-items:center}
+
+/* ── HEADER ── */
+.hdr{width:100%;background:var(--blue-dp);height:54px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+.logo{display:flex;align-items:center;gap:10px;color:#fff;font-weight:800;font-size:1.05rem}
+.logo-ico{width:30px;height:30px;background:#90CAF9;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.logo span{color:#90CAF9}
+.lang-row{display:flex;gap:6px}
+.lang-btn{font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;border:none;cursor:pointer;font-family:inherit;transition:all .2s}
+.lang-btn.on{background:#90CAF9;color:var(--blue-dp)}
+.lang-btn:not(.on){background:transparent;color:#90CAF9;border:1px solid #90CAF9}
+
+/* ── PROGRESS ── */
+.prog{width:100%;max-width:680px;padding:14px 20px 0}
+.prog-row{display:flex;gap:5px}
+.prog-bar{flex:1;height:4px;border-radius:2px;transition:background .4s}
+.prog-bar.done{background:var(--blue)}
+.prog-bar.now{background:var(--blue-dp)}
+.prog-bar.todo{background:var(--border2)}
+.prog-lbl{font-size:11px;color:var(--muted);margin-top:6px;font-family:monospace}
+
+/* ── MAIN ── */
+.main{width:100%;max-width:680px;padding:20px;flex:1;display:flex;flex-direction:column;gap:16px}
+.screen{display:none;flex-direction:column;gap:16px;animation:up .3s ease}
+.screen.on{display:flex}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── TYPO ── */
+.stitle{font-family:'DM Serif Display',Georgia,serif;font-size:1.55rem;line-height:1.2;color:var(--blue-dp);margin-bottom:4px}
+.ssub{font-size:.87rem;color:var(--muted);line-height:1.55}
+
+/* ── CARD ── */
+.card{background:var(--white);border:1.5px solid var(--border2);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
+
+/* ── BOUTONS ── */
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:13px 20px;border-radius:11px;border:none;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;width:100%}
+.btn-p{background:var(--blue);color:#fff;box-shadow:0 3px 10px rgba(25,118,210,.35)}
+.btn-p:hover{background:var(--blue-d)}
+.btn-p:disabled{background:var(--border2);color:var(--muted);cursor:not-allowed;box-shadow:none}
+.btn-dark{background:var(--blue-dp);color:#fff;box-shadow:0 4px 14px rgba(13,71,161,.4);font-size:1rem;padding:15px}
+.btn-dark:hover{background:#0a3d8a}
+.btn-g{background:var(--white);color:var(--blue-d);border:1.5px solid var(--border)}
+.btn-g:hover{border-color:var(--blue);background:var(--blue-l)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-row{display:flex;gap:10px}
+.btn-row .btn{flex:1;width:auto}
+
+/* ── ÉCRAN 0 — ACCUEIL ── */
+.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;min-height:72vh;text-align:center}
+.robot-wrap{position:relative;display:inline-block}
+.robot-emoji{font-size:100px;display:block;animation:float 3s ease-in-out infinite;filter:drop-shadow(0 8px 24px rgba(25,118,210,.45))}
+.stethoscope{position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);font-size:38px;animation:pulse-ico 2s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes pulse-ico{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.2)}}
+.welcome-title{font-family:'DM Serif Display',serif;font-size:2.2rem;color:var(--blue-dp);line-height:1.15;margin-bottom:10px}
+.welcome-sub{font-size:1rem;color:var(--muted);max-width:400px;line-height:1.7;margin:0 auto}
+.btn-start{max-width:260px;font-size:1.1rem;padding:16px 36px;border-radius:50px;animation:glow 2s ease-in-out infinite}
+@keyframes glow{0%,100%{box-shadow:0 6px 20px rgba(25,118,210,.45)}50%{box-shadow:0 8px 32px rgba(25,118,210,.8)}}
+.disclaimer{font-size:.74rem;color:var(--muted);max-width:360px;line-height:1.6}
+
+/* ── ÉCRAN 1 — QUI ── */
+.choice-row{display:flex;gap:14px}
+.choice-card{flex:1;background:var(--white);border:2px solid var(--border2);border-radius:16px;padding:22px 16px;cursor:pointer;text-align:center;transition:all .2s;box-shadow:var(--shadow)}
+.choice-card:hover{border-color:var(--blue);box-shadow:var(--shadow-m)}
+.choice-card.sel{background:var(--blue-dp);border-color:var(--blue-dp);box-shadow:0 4px 16px rgba(13,71,161,.4)}
+.choice-ico{font-size:38px;margin-bottom:10px}
+.choice-title{display:block;font-size:1rem;font-weight:700;color:var(--blue-dp)}
+.choice-card.sel .choice-title,.choice-card.sel .choice-sub{color:#fff}
+.choice-sub{font-size:.78rem;color:var(--muted)}
+.choice-card.sel .choice-sub{color:#90CAF9}
+
+/* ── ÉCRAN 2 — SÉCURITÉ ── */
+.ql-item{display:flex;align-items:center;gap:14px;padding:14px 16px;border:2px solid var(--border2);border-radius:12px;cursor:pointer;transition:all .2s;background:var(--white);box-shadow:var(--shadow)}
+.ql-item:hover{border-color:var(--blue)}
+.ql-item.sel{background:var(--blue-dp);border-color:var(--blue-dp);box-shadow:0 3px 12px rgba(13,71,161,.3)}
+.ql-item.none-opt.sel{background:var(--green-bg);border-color:var(--green)}
+.ql-check{width:22px;height:22px;border-radius:6px;flex-shrink:0;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;transition:all .2s}
+.ql-item.sel .ql-check{background:var(--white);border-color:var(--white)}
+.ql-item.none-opt.sel .ql-check{background:var(--green);border-color:var(--green)}
+.ql-check-mark{color:var(--blue-dp);font-weight:900;font-size:14px;display:none}
+.ql-item.sel .ql-check-mark{display:block}
+.ql-item.none-opt.sel .ql-check-mark{color:#fff}
+.ql-label{font-size:.88rem;font-weight:500;line-height:1.45;color:var(--text)}
+.ql-item.sel .ql-label{color:#fff}
+.ql-item.none-opt.sel .ql-label{color:var(--green)}
+
+/* Alerte critique */
+.crit-alert{background:var(--red-bg);border:2px solid var(--red);border-radius:14px;padding:16px 18px;display:none;gap:12px;align-items:flex-start}
+.crit-alert.on{display:flex;animation:up .3s ease}
+.crit-ico{font-size:30px;flex-shrink:0}
+.crit-title{font-weight:800;color:var(--red);font-size:1rem;margin-bottom:4px}
+.crit-sub{font-size:.84rem;color:#B71C1C;line-height:1.55;margin-bottom:12px}
+.crit-btns{display:flex;gap:8px}
+
+/* ── ÉCRAN 3 — CHAT ── */
+.chat-wrap{background:var(--white);border:2px solid var(--border2);border-radius:16px;box-shadow:var(--shadow-m);display:flex;flex-direction:column;overflow:hidden}
+.chat-hdr{padding:12px 16px;background:var(--blue-dp);display:flex;align-items:center;gap:10px}
+.chat-av{width:32px;height:32px;border-radius:50%;background:#90CAF9;display:flex;align-items:center;justify-content:center;font-size:16px}
+.chat-name{font-size:.87rem;font-weight:700;color:#fff}
+.chat-status{font-size:.72rem;color:#90CAF9}
+.chat-dot{width:8px;height:8px;border-radius:50%;background:#69F0AE;margin-left:auto;box-shadow:0 0 0 3px rgba(105,240,174,.25)}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:320px;max-height:420px}
+.msg{display:flex;gap:8px;max-width:90%}
+.msg.bot{align-self:flex-start}
+.msg.usr{align-self:flex-end;flex-direction:row-reverse}
+.msg-av{width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff}
+.msg.bot .msg-av{background:#90CAF9}
+.msg.usr .msg-av{background:var(--blue-d)}
+.msg-bub{padding:10px 14px;font-size:.87rem;line-height:1.55}
+.msg.bot .msg-bub{background:var(--bg);border:1px solid var(--border2);border-radius:14px 14px 14px 3px;color:var(--text)}
+.msg.usr .msg-bub{background:var(--blue-dp);color:#fff;border-radius:14px 14px 3px 14px}
+.typing-dots{padding:10px 14px;background:var(--bg);border:1px solid var(--border2);border-radius:14px 14px 14px 3px;display:flex;gap:4px;align-items:center;width:fit-content}
+.typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:blink 1.2s infinite}
+.typing-dots span:nth-child(2){animation-delay:.2s}
+.typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+.select-wrap{padding-left:34px}
+.chat-select{width:100%;max-width:440px;border:2px solid var(--blue-d);border-radius:10px;padding:10px 32px 10px 12px;font-family:inherit;font-size:.87rem;color:var(--text);background:var(--white);cursor:pointer;outline:none;transition:border-color .2s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%231565C0' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.chat-select:disabled{opacity:.5;cursor:default;border-color:var(--border2);background-color:#F5F9FE}
+.chips-row{padding-left:34px;display:flex;flex-wrap:wrap;gap:7px}
+.chip{padding:6px 13px;border:1.5px solid var(--border);border-radius:20px;background:var(--white);color:var(--blue-d);font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s}
+.chip:hover{border-color:var(--blue);background:var(--blue-l)}
+
+/* Tableau vitaux inline */
+.vit-inline{padding-left:34px}
+.vit-table{border:2px solid var(--blue-d);border-radius:13px;overflow:hidden;max-width:440px;box-shadow:var(--shadow-m)}
+.vit-hdr{background:var(--blue-dp);padding:10px 14px;font-size:.79rem;font-weight:700;color:#90CAF9}
+.vit-row{display:flex;align-items:center;padding:8px 14px;border-top:1px solid var(--blue-m);gap:10px}
+.vit-lbl{flex:1;font-size:.82rem;font-weight:500}
+.vit-unit{font-family:monospace;font-size:.7rem;color:#fff;background:var(--blue);padding:2px 7px;border-radius:5px;flex-shrink:0}
+.vit-inp{width:82px;border:1.5px solid var(--border2);border-radius:8px;padding:7px 9px;font-family:monospace;font-size:.9rem;font-weight:600;text-align:center;outline:none;background:var(--bg)}
+.vit-inp:focus{border-color:var(--blue)}
+.vit-inp::-webkit-inner-spin-button{opacity:0}
+.vit-footer{padding:10px 14px;border-top:1px solid var(--border2);display:flex;gap:8px;background:#F0F8FF}
+.btn-vit-skip{padding:9px 14px;border-radius:9px;border:1.5px solid var(--border2);background:var(--white);color:var(--muted);font-family:inherit;font-size:.84rem;font-weight:600;cursor:pointer}
+.btn-vit-ok{flex:1;padding:9px;border-radius:9px;border:none;background:var(--blue-dp);color:#fff;font-family:inherit;font-size:.85rem;font-weight:700;cursor:pointer;box-shadow:0 3px 10px rgba(13,71,161,.3)}
+
+/* Input chat */
+.chat-in{padding:11px 13px;border-top:1px solid var(--border2);display:flex;gap:7px;align-items:flex-end;background:var(--white)}
+.chat-textarea{flex:1;border:1.5px solid var(--border2);border-radius:10px;padding:9px 12px;font-family:inherit;font-size:.87rem;color:var(--text);background:var(--bg);resize:none;outline:none;line-height:1.5;max-height:90px;overflow-y:auto}
+.chat-textarea:focus{border-color:var(--blue)}
+.btn-send{width:38px;height:38px;border-radius:9px;border:none;background:var(--blue-dp);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .2s}
+.btn-send:disabled{background:var(--border2);cursor:not-allowed}
+
+/* ── LOCALISATION ── */
+.loc-card{background:var(--white);border:1.5px solid var(--border2);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow)}
+.loc-title{font-size:.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.loc-row{display:flex;gap:8px;align-items:center}
+.loc-input{flex:1;border:1.5px solid var(--border2);border-radius:10px;padding:10px 14px;font-family:inherit;font-size:.9rem;font-weight:600;color:var(--text);background:var(--bg);outline:none;transition:border-color .2s;text-transform:uppercase;letter-spacing:1px}
+.loc-input:focus{border-color:var(--blue);background:var(--white)}
+.loc-input::placeholder{text-transform:none;letter-spacing:0;font-weight:400;color:var(--border)}
+.btn-gps{width:42px;height:42px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);color:var(--blue);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .2s;flex-shrink:0}
+.btn-gps:hover{border-color:var(--blue);background:var(--blue-l)}
+.btn-gps.loading{animation:spin 1s linear infinite}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.loc-status{font-size:.79rem;color:var(--muted);margin-top:6px}
+.loc-status.ok{color:var(--green)}
+.loc-status.err{color:var(--red)}
+
+/* ── RÉSULTAT + RECOS ── */
+.urg-banner{border-radius:var(--r);padding:18px 20px;display:flex;align-items:flex-start;gap:14px;border:2px solid}
+.urg-ico{font-size:28px;flex-shrink:0;margin-top:2px}
+.urg-title{font-size:1.15rem;font-weight:800;margin-bottom:3px}
+.urg-delay{font-size:.83rem;opacity:.85}
+.u1{background:var(--red-bg);border-color:var(--red);color:var(--red)}
+.u2{background:var(--orange-bg);border-color:var(--orange);color:var(--orange)}
+.u3{background:var(--yellow-bg);border-color:var(--yellow);color:var(--yellow)}
+.u4{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.u5{background:var(--blue-l);border-color:var(--blue);color:var(--blue)}
+
+.res-sec{background:var(--white);border:1.5px solid var(--border2);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow)}
+.sec-lbl{font-size:.71rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:13px}
+
+/* Prédiction séjour XGBoost */
+.sejour-wrap{display:flex;flex-direction:column;gap:10px}
+.sejour-total{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--blue-dp);border-radius:11px;color:#fff}
+.sejour-total-lbl{font-size:.87rem;font-weight:600;opacity:.85}
+.sejour-total-val{font-family:monospace;font-size:1.6rem;font-weight:800}
+.sejour-detail{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.sejour-item{background:var(--bg);border:1.5px solid var(--border2);border-radius:10px;padding:12px;text-align:center}
+.sejour-item-val{font-family:monospace;font-size:1.1rem;font-weight:800;color:var(--blue-dp);margin-bottom:3px}
+.sejour-item-lbl{font-size:.73rem;color:var(--muted);line-height:1.3}
+.sejour-conf{font-size:.75rem;color:var(--muted);text-align:right;margin-top:4px;font-family:monospace}
+
+/* Recommandations traitements */
+.treat-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border2)}
+.treat-item:last-child{border-bottom:none}
+.treat-ico-wrap{width:30px;height:30px;border-radius:50%;background:var(--blue-l);border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.treat-title{font-size:.85rem;font-weight:700;color:var(--blue-dp);margin-bottom:2px}
+.treat-desc{font-size:.81rem;color:var(--muted);line-height:1.5}
+
+/* Carte hôpital dans la liste */
+.reco-card{background:var(--white);border:2px solid var(--border2);border-radius:14px;padding:16px 18px;cursor:pointer;transition:all .2s;box-shadow:var(--shadow)}
+.reco-card:hover{border-color:var(--blue);box-shadow:var(--shadow-m);transform:translateY(-1px)}
+.reco-card.top{border-color:var(--blue-d);box-shadow:var(--shadow-m)}
+.top-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;color:var(--blue-d);background:var(--blue-l);border-radius:5px;padding:3px 9px;margin-bottom:8px;letter-spacing:.4px}
+.type-pill{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:2px 8px;border-radius:5px;margin-bottom:7px}
+.reco-name{font-size:.95rem;font-weight:800;color:var(--blue-dp);margin-bottom:2px}
+.reco-addr{font-size:.77rem;color:var(--muted);margin-bottom:10px}
+.reco-meta{display:flex;flex-wrap:wrap;gap:12px}
+.reco-stat{font-size:.8rem;display:flex;align-items:center;gap:5px}
+.reco-dot{width:6px;height:6px;border-radius:50%}
+.reco-score-bar{height:3px;background:var(--border2);border-radius:2px;margin-top:10px;overflow:hidden}
+.reco-score-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--blue-dp));border-radius:2px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.reco-hint{font-size:.76rem;color:var(--blue);margin-top:8px;font-weight:600;text-align:right}
+
+/* Achalandage badge */
+.achal-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:.76rem;font-weight:700}
+.achal-low{background:#E8F5E9;color:#1B5E20}
+.achal-mid{background:#FFF9C4;color:#F57F17}
+.achal-high{background:#FFEBEE;color:#C62828}
+
+/* Section technique */
+.tech-toggle{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:.78rem;color:var(--muted);user-select:none;font-weight:600;padding:10px 0;border-top:1px solid var(--border2);margin-top:4px}
+.tech-body{display:none;padding-top:12px;border-top:1px solid var(--border2);margin-top:10px}
+.tech-body.on{display:block;animation:up .2s ease}
+.proba-row{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+.proba-lbl{font-family:monospace;font-size:.74rem;width:46px;flex-shrink:0;font-weight:700}
+.proba-track{flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
+.proba-fill{height:100%;border-radius:3px;transition:width 1s}
+.proba-pct{font-family:monospace;font-size:.74rem;color:var(--muted);width:32px;text-align:right}
+
+/* ── OVERLAY HÔPITAL ── */
+.overlay{position:fixed;inset:0;background:rgba(13,71,161,.45);backdrop-filter:blur(4px);z-index:500;display:none;align-items:flex-end;justify-content:center}
+.overlay.on{display:flex;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.hosp-sheet{background:var(--white);border-radius:20px 20px 0 0;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;padding:24px 22px 32px;box-shadow:0 -8px 32px rgba(13,71,161,.25);animation:slideUp2 .3s ease}
+@keyframes slideUp2{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.hosp-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px}
+.hosp-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:18px}
+.hosp-name-wrap{flex:1}
+.hosp-name{font-family:'DM Serif Display',serif;font-size:1.3rem;color:var(--blue-dp);margin-bottom:4px;line-height:1.2}
+.hosp-addr{font-size:.82rem;color:var(--muted)}
+.hosp-close{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border2);background:var(--bg);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;transition:all .15s}
+.hosp-close:hover{border-color:var(--red);color:var(--red)}
+.hosp-section{margin-bottom:18px}
+.hosp-sec-title{font-size:.71rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.hosp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hosp-stat{background:var(--bg);border:1.5px solid var(--border2);border-radius:10px;padding:12px;text-align:center}
+.hosp-stat-val{font-family:monospace;font-size:1.2rem;font-weight:800;color:var(--blue-dp);margin-bottom:2px}
+.hosp-stat-lbl{font-size:.73rem;color:var(--muted);line-height:1.3}
+.spec-list{display:flex;flex-wrap:wrap;gap:6px}
+.spec-tag{padding:4px 10px;background:var(--blue-l);border:1px solid var(--border);border-radius:20px;font-size:.78rem;color:var(--blue-dp);font-weight:600}
+.achal-chart{display:flex;align-items:flex-end;gap:3px;height:50px}
+.achal-bar{flex:1;border-radius:3px 3px 0 0;min-height:4px;transition:height .5s}
+.achal-hours{display:flex;justify-content:space-between;font-size:.65rem;color:var(--muted);margin-top:4px;font-family:monospace}
+.hosp-sejour{background:var(--blue-dp);border-radius:12px;padding:16px;color:#fff;margin-bottom:14px}
+.hosp-sejour-title{font-size:.8rem;font-weight:700;color:#90CAF9;margin-bottom:10px}
+.hosp-sejour-total{font-family:monospace;font-size:1.8rem;font-weight:800;margin-bottom:10px}
+.hosp-sejour-detail{display:flex;gap:8px}
+.hosp-sejour-item{flex:1;background:rgba(255,255,255,.12);border-radius:8px;padding:8px;text-align:center}
+.hosp-sejour-item-val{font-family:monospace;font-size:1rem;font-weight:800;margin-bottom:2px}
+.hosp-sejour-item-lbl{font-size:.7rem;opacity:.8}
+
+/* Footer */
+.footer{text-align:center;padding:16px 20px;font-size:.72rem;color:var(--muted);border-top:1px solid var(--border2);width:100%;margin-top:auto}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+@media(max-width:500px){.choice-row{flex-direction:column}.sejour-detail{grid-template-columns:1fr}}
+
+/* ── OVERLAY CLÉ API ── */
+.apikey-overlay{position:fixed;inset:0;background:rgba(13,27,42,.97);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
+.apikey-box{background:var(--white);border-radius:20px;padding:36px 32px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5);text-align:center}
+.apikey-emoji{font-size:56px;margin-bottom:12px}
+.apikey-title{font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--blue-dp);margin-bottom:8px}
+.apikey-sub{font-size:.88rem;color:var(--muted);margin-bottom:24px;line-height:1.6}
+.apikey-input{width:100%;border:2px solid var(--border2);border-radius:10px;padding:12px 16px;font-family:monospace;font-size:.95rem;outline:none;margin-bottom:12px;box-sizing:border-box;color:var(--text);background:var(--bg);transition:border-color .2s}
+.apikey-input:focus{border-color:var(--blue)}
+.apikey-input.err{border-color:var(--red)}
+.apikey-btn{width:100%;background:var(--blue-dp);color:#fff;border:none;border-radius:10px;padding:14px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:16px;transition:background .2s}
+.apikey-btn:hover{background:#0a3d8a}
+.apikey-note{font-size:.72rem;color:#90A4AE;line-height:1.65}
+
+/* ── ÉCRAN 2W — WARN ── */
+.warn-item{padding:10px 14px;background:var(--white);border:1.5px solid var(--border2);border-radius:10px;font-size:.85rem;line-height:1.45;color:var(--text);display:flex;align-items:center;gap:10px}
+.warn-item-ico{font-size:18px;flex-shrink:0}
+.warn-banner-red{background:var(--red);color:#fff;border-radius:12px;padding:14px 18px;text-align:center;font-weight:800;font-size:1rem;letter-spacing:.3px}
+</style>
+</head>
+<body>
+
+<!-- ══ OVERLAY CLÉ API GROQ ══ -->
+<div class="apikey-overlay" id="apikey-overlay">
+  <div class="apikey-box">
+    <div class="apikey-emoji">🔑</div>
+    <div class="apikey-title">OrientIA MTL</div>
+    <div class="apikey-sub">Entrez votre clé API Groq pour démarrer.<br><em>Enter your Groq API key to start.</em></div>
+    <input class="apikey-input" type="password" id="groq-key-input" placeholder="gsk_..."
+      onkeydown="if(event.key==='Enter')startWithKey()">
+    <button class="apikey-btn" onclick="startWithKey()">🚀 Lancer OrientIA</button>
+    <div class="apikey-note">
+      🔒 Votre clé est utilisée uniquement dans votre navigateur pendant cette session. Elle n'est jamais stockée ni transmise à nos serveurs.<br>
+      <em>Your key is only used in your browser during this session and is never stored or sent to our servers.</em>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="logo"><div class="logo-ico">🏥</div>OrientIA <span>MTL</span></div>
+  <div class="lang-row">
+    <button class="lang-btn on" id="lb-fr" onclick="setLang('fr')">FR</button>
+    <button class="lang-btn"    id="lb-en" onclick="setLang('en')">EN</button>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="prog" id="prog-wrap">
+  <div class="prog-row" id="prog-row"></div>
+  <div class="prog-lbl" id="prog-lbl"></div>
+</div>
+
+<div class="main" id="main">
+
+<!-- ══ ÉCRAN 0 — ACCUEIL ══ -->
+<div class="screen on" id="s0">
+  <div class="welcome">
+    <div class="robot-wrap">
+      <span class="robot-emoji">🤖</span>
+      <span class="stethoscope">🩺</span>
+    </div>
+    <div>
+      <div class="welcome-title" id="w-title">Bonjour, je suis OrientIA</div>
+      <div class="welcome-sub"  id="w-sub">Votre assistant médical intelligent pour Montréal. Je vous aide à trouver le bon point de service selon vos symptômes.</div>
+    </div>
+    <button class="btn btn-p btn-start" onclick="go(1)" id="w-btn">Commencer ✨</button>
+    <div class="disclaimer" id="w-disc">⚠️ Prototype académique — ne remplace pas un professionnel de santé. Urgence : appelez le 911.</div>
+  </div>
+</div>
+
+<!-- ══ ÉCRAN 1 — QUI CONSULTE ══ -->
+<div class="screen" id="s1">
+  <div>
+    <div class="stitle" id="s1-title">Pour qui consultez-vous ?</div>
+    <div class="ssub"   id="s1-sub">Cela nous aide à adapter nos questions.</div>
+  </div>
+  <div class="choice-row">
+    <div class="choice-card" id="c-moi" onclick="pickWho('moi')">
+      <div class="choice-ico">🙋</div>
+      <strong class="choice-title" id="c-moi-t">Pour moi</strong>
+      <span class="choice-sub" id="c-moi-s">Je consulte pour moi-même</span>
+    </div>
+    <div class="choice-card" id="c-autre" onclick="pickWho('autre')">
+      <div class="choice-ico">👥</div>
+      <strong class="choice-title" id="c-autre-t">Pour quelqu'un d'autre</strong>
+      <span class="choice-sub" id="c-autre-s">Un proche, un enfant...</span>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-g" style="max-width:110px" onclick="go(0)" id="s1-back">← Retour</button>
+    <button class="btn btn-p" id="s1-next" onclick="buildQL();go(2)" disabled>Continuer →</button>
+  </div>
+</div>
+
+<!-- ══ ÉCRAN 2 — SÉCURITÉ ══ -->
+<div class="screen" id="s2">
+  <div>
+    <div class="stitle" id="s2-title">Questions de sécurité</div>
+    <div class="ssub"   id="s2-sub">Cochez la ou les situations qui s'appliquent.</div>
+  </div>
+  <div class="crit-alert" id="crit-alert">
+    <div class="crit-ico">🚨</div>
+    <div>
+      <div class="crit-title" id="crit-title">Situation potentiellement critique</div>
+      <div class="crit-sub"   id="crit-sub">Nous vous recommandons fortement d'appeler le 911 ou de vous rendre à l'urgence la plus proche immédiatement.</div>
+      <div class="crit-btns">
+        <a href="tel:911" class="btn btn-danger" style="flex:1;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:10px;padding:11px;font-size:.87rem;font-weight:800">📞 <span id="btn-911">Appeler le 911</span></a>
+        <button class="btn btn-g" style="flex:1;font-size:.82rem" onclick="goWarn()" id="btn-continue-anyway">Continuer quand même →</button>
+      </div>
+    </div>
+  </div>
+  <div id="ql-list" style="display:flex;flex-direction:column;gap:9px"></div>
+  <div class="btn-row">
+    <button class="btn btn-g" style="max-width:110px" onclick="go(1)" id="s2-back">← Retour</button>
+    <button class="btn btn-p" id="s2-next" onclick="checkQL()" disabled>Continuer →</button>
+  </div>
+</div>
+
+<!-- ══ ÉCRAN 2W — AVERTISSEMENT URGENCE ══ -->
+<div class="screen" id="s2w">
+  <div class="warn-banner-red">🚨 CECI N'EST PAS UN SERVICE D'URGENCE</div>
+  <div>
+    <div class="stitle" id="s2w-title">Confirmez votre situation</div>
+    <div class="ssub"   id="s2w-sub">Confirmez qu'aucune des situations suivantes ne s'applique en ce moment.</div>
+  </div>
+  <div id="warn-list" style="display:flex;flex-direction:column;gap:8px"></div>
+  <div style="background:var(--blue-l);border:2px solid var(--border2);border-radius:12px;padding:16px">
+    <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer">
+      <input type="checkbox" id="warn-confirm" onchange="toggleWarnBtn()"
+        style="width:20px;height:20px;flex-shrink:0;margin-top:2px;cursor:pointer;accent-color:var(--blue-dp)">
+      <span style="font-size:.85rem;color:var(--text);line-height:1.55" id="warn-confirm-lbl">Je confirme qu'aucune de ces situations ne s'applique et que je comprends qu'OrientIA ne remplace pas les services d'urgence.</span>
+    </label>
+  </div>
+  <div class="btn-row">
+    <a href="tel:911" class="btn btn-danger" style="flex:1;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:800">📞 911</a>
+    <a href="tel:811" class="btn btn-p"      style="flex:1;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:800">📞 811</a>
+  </div>
+  <div class="card">
+    <div class="loc-title" id="warn-proche-title">📱 Alerter un proche</div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <input type="tel" id="proche-tel" placeholder="Numéro de téléphone"
+        style="flex:1;border:1.5px solid var(--border2);border-radius:10px;padding:10px 14px;font-family:inherit;font-size:.87rem;outline:none;background:var(--bg);color:var(--text)">
+      <button onclick="alerterProche()" id="warn-alert-btn"
+        style="padding:10px 16px;background:var(--blue-dp);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:.85rem;font-weight:700;cursor:pointer">Alerter</button>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-g" style="max-width:110px" onclick="go(2)" id="s2w-back">← Retour</button>
+    <button class="btn btn-p" id="s2w-next" onclick="go(3)" disabled>Continuer →</button>
+  </div>
+</div>
+
+<!-- ══ ÉCRAN 3 — CHAT ══ -->
+<div class="screen" id="s3">
+  <div>
+    <div class="stitle" id="s3-title">Décrivez votre situation</div>
+    <div class="ssub"   id="s3-sub">Sélectionnez ou tapez librement.</div>
+  </div>
+
+  <div class="chat-wrap">
+    <div class="chat-hdr">
+      <div class="chat-av">🤖</div>
+      <div><div class="chat-name" id="chat-name">Assistant OrientIA</div><div class="chat-status" id="chat-status">En ligne · Français &amp; English</div></div>
+      <div class="chat-dot"></div>
+    </div>
+    <div class="chat-msgs" id="chat-msgs"></div>
+    <div class="chat-in">
+      <textarea class="chat-textarea" id="chat-inp" rows="1" placeholder="Décrivez ce que vous ressentez..." onkeydown="onKey(event)" oninput="resize(this)"></textarea>
+      <button class="btn-send" id="btn-send" onclick="sendMsg()">➤</button>
+    </div>
+  </div>
+
+  <button class="btn btn-dark" onclick="go(4);buildResult()" id="s3-reco">Passer aux recommandations →</button>
+</div>
+
+<!-- ══ ÉCRAN 4 — RÉSULTAT + RECOS ══ -->
+<div class="screen" id="s4">
+
+  <!-- Localisation -->
+  <div class="loc-card">
+    <div class="loc-title" id="loc-title">📍 Votre localisation</div>
+    <div class="loc-row">
+      <input class="loc-input" type="text" id="loc-input" placeholder="Code postal (ex: H2X 1Y4)" maxlength="7" oninput="onPostalInput(this)">
+      <button class="btn-gps" id="btn-gps" onclick="getGPS()" title="Utiliser ma position GPS">📡</button>
+    </div>
+    <div class="loc-status" id="loc-status"></div>
+  </div>
+
+  <!-- Banner urgence -->
+  <div class="urg-banner" id="urg-banner">
+    <div class="urg-ico" id="urg-ico">🟡</div>
+    <div>
+      <div class="urg-title" id="urg-title">Votre situation mérite une attention rapide</div>
+      <div class="urg-delay" id="urg-delay">Nous vous recommandons de consulter dans les 30 prochaines minutes</div>
+    </div>
+  </div>
+
+  <!-- Observations -->
+  <div class="res-sec">
+    <div class="sec-lbl" id="lbl-obs">📋 Ce qu'on a observé</div>
+    <div id="res-obs" style="font-size:.88rem;line-height:1.7"></div>
+  </div>
+
+  <!-- Prédiction séjour XGBoost -->
+  <div class="res-sec">
+    <div class="sec-lbl" id="lbl-sejour">⏱️ Temps de séjour estimé (modèle XGBoost)</div>
+    <div class="sejour-wrap" id="sejour-wrap"></div>
+  </div>
+
+  <!-- Recommandations traitement -->
+  <div class="res-sec">
+    <div class="sec-lbl" id="lbl-treat">💊 Recommandations immédiates</div>
+    <div id="treat-list"></div>
+  </div>
+
+  <!-- Recommandations consultation -->
+  <div class="res-sec">
+    <div class="sec-lbl" id="lbl-recos">📍 Où consulter</div>
+    <div id="reco-list" style="display:flex;flex-direction:column;gap:10px"></div>
+  </div>
+
+  <!-- Section technique masquée -->
+  <div class="res-sec" style="padding-bottom:14px">
+    <div class="tech-toggle" onclick="toggleTech()">
+      <span>⚙️</span>
+      <span id="lbl-tech">Analyse technique (démonstration)</span>
+      <span id="tech-arrow" style="margin-left:auto">▼</span>
+    </div>
+    <div class="tech-body" id="tech-body">
+      <div id="proba-bars"></div>
+      <div style="margin-top:12px" id="tech-details"></div>
+    </div>
+  </div>
+
+  <div style="font-size:.72rem;color:var(--muted);text-align:center;line-height:1.65" id="disc-txt">
+    ⚠️ Prototype académique — ne remplace pas un professionnel de santé. En cas de doute, appelez le <strong>811</strong>.
+  </div>
+  <button class="btn btn-g" onclick="reset()" id="btn-reset">↺ Nouvelle consultation</button>
+</div>
+
+</div><!-- /main -->
+
+<!-- ══ OVERLAY HÔPITAL ══ -->
+<div class="overlay" id="overlay" onclick="closeOverlay(event)">
+  <div class="hosp-sheet" id="hosp-sheet">
+    <div class="hosp-handle"></div>
+    <div class="hosp-header">
+      <div class="hosp-name-wrap">
+        <div class="hosp-name" id="ov-name"></div>
+        <div class="hosp-addr" id="ov-addr"></div>
+      </div>
+      <button class="hosp-close" onclick="closeOverlayBtn()">✕</button>
+    </div>
+    <div id="ov-content"></div>
+  </div>
+</div>
+
+<div class="footer">OrientIA MTL · Prototype académique · TECH 60711 H2026 · Données simulées</div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+//  GROQ API
+// ════════════════════════════════════════════════════════════
+const GROQ_API_KEY = window._groqKey || '';
+const GROQ_MODEL   = 'llama-3.1-8b-instant';
+const GROQ_URL     = 'https://api.groq.com/openai/v1/chat/completions';
+
+function startWithKey() {
+  const inp = document.getElementById('groq-key-input');
+  const key = inp.value.trim();
+  if (!key) { inp.classList.add('err'); return; }
+  inp.classList.remove('err');
+  window._groqKey = key;
+  document.getElementById('apikey-overlay').style.display = 'none';
+}
+
+// ════════════════════════════════════════════════════════════
+//  ÉTAT GLOBAL
+// ════════════════════════════════════════════════════════════
+const G = {
+  lang:'fr', pourSoi:null, qlSel:[], showAlert:false,
+  hist:[], chatReady:false, waiting:false,
+  ageGroup:null, sexe:null,
+  ext:{ cat:'', pid:'', ctasOverride:null, intensite:null, duree:'', flags:[] },
+  vitaux:{ spo2:'', tension:'', fc:'', temp:'', glyc:'' },
+  localisation:{ lat:null, lon:null, codePostal:'', source:'' },
+  curScreen:0,
+};
+
+// ════════════════════════════════════════════════════════════
+//  TRADUCTIONS
+// ════════════════════════════════════════════════════════════
+const TR = {
+  fr:{
+    steps:['Accueil','Qui consulte','Sécurité','Évaluation','Résultat'],
+    'w-title':'Bonjour, je suis OrientIA',
+    'w-sub':'Votre assistant médical intelligent pour Montréal. Je vous aide à trouver le bon point de service selon vos symptômes.',
+    'w-btn':'Commencer ✨',
+    'w-disc':'⚠️ Prototype académique — ne remplace pas un professionnel de santé. Urgence : appelez le 911.',
+    's1-title':'Pour qui consultez-vous ?','s1-sub':'Cela nous aide à adapter nos questions.',
+    'c-moi-t':'Pour moi','c-moi-s':'Je consulte pour moi-même',
+    'c-autre-t':"Pour quelqu'un d'autre",'c-autre-s':'Un proche, un enfant...',
+    's2-title':'Questions de sécurité','s2-sub':"Cochez la ou les situations qui s'appliquent.",
+    'crit-title':'Situation potentiellement critique',
+    'crit-sub':"Nous vous recommandons fortement d'appeler le 911 ou de vous rendre à l'urgence la plus proche immédiatement.",
+    'btn-911':'Appeler le 911','btn-continue-anyway':'Continuer quand même →',
+    's3-title':'Décrivez votre situation','s3-sub':'Sélectionnez ou tapez librement.',
+    'loc-title':'📍 Votre localisation','s3-reco':'Passer aux recommandations →',
+    'chat-name':'Assistant OrientIA','chat-status':'En ligne · Français &amp; English',
+    'lbl-obs':"📋 Ce qu'on a observé",'lbl-sejour':'⏱️ Temps de séjour estimé (modèle XGBoost)',
+    'lbl-treat':'💊 Recommandations immédiates','lbl-recos':'📍 Où consulter',
+    'lbl-tech':'Analyse technique (démonstration)',
+    'disc-txt':'⚠️ Prototype académique — ne remplace pas un professionnel de santé. En cas de doute, appelez le <strong>811</strong>.',
+    'btn-reset':'↺ Nouvelle consultation',
+    'cat-ph':'— Choisissez une catégorie —','sym-ph':'— Choisissez un symptôme —',
+    'vit-hdr':'📊 Signes vitaux — entrez ce que vous connaissez',
+    'vit-skip':'Ignorer','vit-ok':'Confirmer les valeurs ✓',
+    'loc-ph':'Code postal (ex: H2X 1Y4)',
+    'ql-none':"Aucune de ces situations ne s'applique",
+    'obs-plainte':'Plainte principale','obs-dur':'Durée','obs-int':'Intensité','obs-flags':'Éléments notés',
+    'np':'non précisée',
+    'best':'Meilleure option','open-detail':'Voir les détails →',
+    'ov-specs':'Spécialisations','ov-achal':'Achalandage (simulation temps réel)',
+    'ov-sejour':'Prédiction temps de séjour — XGBoost',
+    'ov-attente':'Attente avant médecin','ov-consult':'Consultation','ov-examens':'Examens',
+    'ov-hours':'Heures d\'ouverture','ov-total':'Séjour total estimé',
+    'achal-low':'Calme','achal-mid':'Modéré','achal-high':'Achalandé',
+    'sejour-total':'Séjour total estimé',
+    'sejour-attente':'Attente médecin','sejour-consult':'Consultation','sejour-examens':'Examens',
+    'conf-label':'Confiance du modèle',
+    's2w-title':'Confirmez votre situation',
+    's2w-sub':"Confirmez qu'aucune des situations suivantes ne s'applique en ce moment.",
+    'warn-confirm-lbl':"Je confirme qu'aucune de ces situations ne s'applique et que je comprends qu'OrientIA ne remplace pas les services d'urgence.",
+    'warn-proche-title':'📱 Alerter un proche',
+    'warn-proche-ph':'Numéro de téléphone',
+    'warn-alert-btn':'Alerter',
+    's2w-back':'← Retour',
+    's2w-next':'Continuer →',
+  },
+  en:{
+    steps:['Welcome','Who','Safety','Assessment','Result'],
+    'w-title':'Hello, I\'m OrientIA',
+    'w-sub':'Your intelligent medical assistant for Montreal. I help you find the right care based on your symptoms.',
+    'w-btn':'Get started ✨',
+    'w-disc':'⚠️ Academic prototype — does not replace medical advice. Emergency: call 911.',
+    's1-title':'Who are you consulting for?','s1-sub':'This helps us tailor our questions.',
+    'c-moi-t':'For myself','c-moi-s':'I am consulting for myself',
+    'c-autre-t':'For someone else','c-autre-s':'A loved one, a child...',
+    's2-title':'Safety questions','s2-sub':'Check the situation(s) that apply.',
+    'crit-title':'Potentially critical situation',
+    'crit-sub':'We strongly recommend calling 911 or going to the nearest emergency room immediately.',
+    'btn-911':'Call 911','btn-continue-anyway':'Continue anyway →',
+    's3-title':'Describe your situation','s3-sub':'Select or type freely.',
+    'loc-title':'📍 Your location','s3-reco':'Go to recommendations →',
+    'chat-name':'OrientIA Assistant','chat-status':'Online · Français &amp; English',
+    'lbl-obs':'📋 What we observed','lbl-sejour':'⏱️ Estimated length of stay (XGBoost model)',
+    'lbl-treat':'💊 Immediate recommendations','lbl-recos':'📍 Where to go',
+    'lbl-tech':'Technical analysis (demonstration)',
+    'disc-txt':'⚠️ Academic prototype — does not replace medical advice. If in doubt, call <strong>811</strong>.',
+    'btn-reset':'↺ New consultation',
+    'cat-ph':'— Choose a category —','sym-ph':'— Choose a symptom —',
+    'vit-hdr':'📊 Vital signs — enter what you know',
+    'vit-skip':'Skip','vit-ok':'Confirm values ✓',
+    'loc-ph':'Postal code (e.g. H2X 1Y4)',
+    'ql-none':'None of these situations apply',
+    'obs-plainte':'Main complaint','obs-dur':'Duration','obs-int':'Intensity','obs-flags':'Noted elements',
+    'np':'unspecified',
+    'best':'Best option','open-detail':'View details →',
+    'ov-specs':'Specializations','ov-achal':'Occupancy (real-time simulation)',
+    'ov-sejour':'Length of stay prediction — XGBoost',
+    'ov-attente':'Wait before doctor','ov-consult':'Consultation','ov-examens':'Tests/exams',
+    'ov-hours':'Opening hours','ov-total':'Estimated total stay',
+    'achal-low':'Calm','achal-mid':'Moderate','achal-high':'Busy',
+    'sejour-total':'Estimated total stay',
+    'sejour-attente':'Wait for doctor','sejour-consult':'Consultation','sejour-examens':'Tests',
+    'conf-label':'Model confidence',
+    's2w-title':'Confirm your situation',
+    's2w-sub':'Confirm that none of the following situations apply right now.',
+    'warn-confirm-lbl':"I confirm that none of these situations apply and that I understand OrientIA does not replace emergency services.",
+    'warn-proche-title':'📱 Alert a contact',
+    'warn-proche-ph':'Phone number',
+    'warn-alert-btn':'Alert',
+    's2w-back':'← Back',
+    's2w-next':'Continue →',
+  }
+};
+
+function t(k){ return TR[G.lang][k] || TR.fr[k] || k; }
+function isFr(){ return G.lang === 'fr'; }
+
+// ════════════════════════════════════════════════════════════
+//  DONNÉES CATÉGORIES (base de données CTAS)
+// ════════════════════════════════════════════════════════════
+const CATS = {
+  fr:[
+    {id:'Cardiaque',    ico:'🫀',label:'Cardiaque',       symptoms:["Douleur forte à la poitrine","Douleur qui monte dans le bras ou la mâchoire","Palpitations — cœur qui s'emballe","Cœur qui bat irrégulièrement","J'ai failli perdre connaissance"]},
+    {id:'Respiratoire', ico:'🫁',label:'Respiratoire',    symptoms:["Je suis très essoufflé au repos","Essoufflé en marchant","Toux depuis plusieurs jours","Lèvres ou ongles bleutés"]},
+    {id:'Neurologique', ico:'🧠',label:'Neurologique',    symptoms:["Faiblesse soudaine d'un côté du corps","Difficulté soudaine à parler","Pire mal de tête de ma vie","La pièce tourne — vertiges intenses","Engourdissement d'un bras ou d'une jambe"]},
+    {id:'Traumatisme',  ico:'🦴',label:'Traumatisme / Blessure',symptoms:["Chute ou accident grave","Je pense que c'est cassé","Entorse — cheville ou poignet tordu","Coupure qui saigne beaucoup","Coup à la tête"]},
+    {id:'Digestif',     ico:'🤢',label:'Digestif / Ventre',symptoms:["Douleur au ventre intense","Je vomis mais je peux boire","Sang dans les vomissements ou selles","Nausées sans vomissements","Diarrhée importante"]},
+    {id:'Infectieux',   ico:'🌡️',label:'Fièvre / Infection',symptoms:["Fièvre avec frissons et grande fatigue","Fièvre avec maladie chronique","Infection qui empire depuis plusieurs jours","Bébé de moins de 3 mois avec de la fièvre"]},
+    {id:'Métabolique',  ico:'💉',label:'Diabète / Métabolique',symptoms:["Tremblements, sueurs et confusion — diabétique","Soif extrême et respiration rapide","Glycémie très basse ou très haute"]},
+    {id:'MSK',          ico:'🦵',label:'Muscles / Articulations',symptoms:["Articulation gonflée, chaude et douloureuse","Douleur au dos apparue soudainement","Mal de dos chronique habituel","Douleur musculaire ou contracture"]},
+    {id:'ORL',          ico:'👂',label:'ORL / Gorge / Oreille',symptoms:["Douleur à l'oreille","Mal de gorge intense","Rhume ordinaire","Nez qui saigne abondamment"]},
+    {id:'Yeux',         ico:'👁️',label:'Yeux / Vision',    symptoms:["Perte de vision soudaine d'un œil","Douleur très forte dans un œil","Quelque chose est entré dans mon œil","Œil rouge sans douleur"]},
+    {id:'Psychiatrie',  ico:'🧘',label:'Santé mentale',    symptoms:["Envie de me faire du mal maintenant","Crise de panique — cœur rapide, souffle court","Très agité, difficile à calmer","Anxiété chronique habituelle"]},
+    {id:'Gynécologie',  ico:'🌸',label:'Gynécologie',      symptoms:["Douleur très forte dans le bas-ventre soudaine","Saignements vaginaux abondants et inhabituels","Douleur pelvienne modérée","Enceinte avec douleurs ou contractions inhabituelles"]},
+    {id:'Dentaire',     ico:'🦷',label:'Dentaire',         symptoms:["Forte douleur dentaire avec gonflement et fièvre","Douleur dentaire sans fièvre","Douleur légère après un soin dentaire récent"]},
+    {id:'Intoxication', ico:'⚠️',label:'Intoxication / Surdose',symptoms:["A pris trop de médicaments ou une substance dangereuse","Consommation de drogues avec malaise","Ingestion accidentelle d'un produit toxique"]},
+    {id:'Administratif',ico:'📋',label:'Administratif / Autre',symptoms:["Renouvellement d'ordonnance","Certificat médical","Suivi de routine","Autre — pas de symptôme aigu"]},
+  ],
+  en:[
+    {id:'Cardiaque',    ico:'🫀',label:'Cardiac',          symptoms:["Strong chest pain","Pain going to arm or jaw","Palpitations — heart racing","Irregular heartbeat","Almost lost consciousness"]},
+    {id:'Respiratoire', ico:'🫁',label:'Respiratory',      symptoms:["Very short of breath at rest","Short of breath walking","Cough for several days","Blue lips or fingernails"]},
+    {id:'Neurologique', ico:'🧠',label:'Neurological',     symptoms:["Sudden weakness on one side","Sudden difficulty speaking","Worst headache of my life","Room spinning — severe dizziness","Numbness in arm or leg"]},
+    {id:'Traumatisme',  ico:'🦴',label:'Trauma / Injury',  symptoms:["Serious fall or accident","I think something is broken","Sprain — twisted ankle or wrist","Bleeding cut","Head injury"]},
+    {id:'Digestif',     ico:'🤢',label:'Digestive / Belly',symptoms:["Intense belly pain","Vomiting but can still drink","Blood in vomit or stool","Nausea without vomiting","Severe diarrhea"]},
+    {id:'Infectieux',   ico:'🌡️',label:'Fever / Infection',symptoms:["Fever with chills and fatigue","Fever with chronic illness","Worsening infection","Baby under 3 months with fever"]},
+    {id:'Métabolique',  ico:'💉',label:'Diabetes / Metabolic',symptoms:["Trembling, sweating, confusion — diabetic","Extreme thirst and fast breathing","Very low or very high blood sugar"]},
+    {id:'MSK',          ico:'🦵',label:'Muscles / Joints', symptoms:["Swollen hot painful joint","Sudden back pain","Chronic back pain","Muscle pain or cramp"]},
+    {id:'ORL',          ico:'👂',label:'ENT / Throat / Ear',symptoms:["Ear pain","Severe sore throat","Common cold","Heavy nosebleed"]},
+    {id:'Yeux',         ico:'👁️',label:'Eyes / Vision',    symptoms:["Sudden vision loss in one eye","Very strong eye pain","Something in my eye","Red eye without pain"]},
+    {id:'Psychiatrie',  ico:'🧘',label:'Mental health',    symptoms:["Want to hurt myself now","Panic attack — racing heart, short breath","Very agitated, hard to calm","Chronic anxiety"]},
+    {id:'Gynécologie',  ico:'🌸',label:'Gynecology',       symptoms:["Sudden severe lower belly pain","Abnormal heavy vaginal bleeding","Moderate pelvic pain","Pregnant with unusual pain"]},
+    {id:'Dentaire',     ico:'🦷',label:'Dental',           symptoms:["Bad tooth pain with swelling and fever","Tooth pain without fever","Mild pain after dental work"]},
+    {id:'Intoxication', ico:'⚠️',label:'Poisoning / Overdose',symptoms:["Took too many pills or a dangerous substance","Drug use with feeling sick","Accidental toxic ingestion"]},
+    {id:'Administratif',ico:'📋',label:'Administrative / Other',symptoms:["Prescription renewal","Medical certificate","Routine follow-up","Other — no acute symptom"]},
+  ]
+};
+
+const QL = {
+  fr:{
+    moi:[
+      {id:'resp',  q:"Avez-vous une très grande difficulté à respirer, même au repos ?"},
+      {id:'poitr', q:"Ressentez-vous une douleur très forte à la poitrine qui s'étend dans le bras gauche ou la mâchoire ?"},
+      {id:'consc', q:"Vous sentez-vous sur le point de perdre connaissance ?"},
+      {id:'allerg',q:"Avez-vous une réaction allergique grave — gorge qui se serre ou visage très enflé ?"},
+      {id:'tremb', q:"Votre corps tremble-t-il de façon incontrôlable en ce moment ?"},
+    ],
+    autre:[
+      {id:'reveil',q:"Est-elle impossible à réveiller ou ne répond-elle à rien ?"},
+      {id:'resp',  q:"A-t-elle arrêté de respirer ou respire-t-elle avec une grande difficulté ?"},
+      {id:'tremb', q:"Son corps tremble-t-il de façon incontrôlable en ce moment ?"},
+      {id:'choc',  q:"Est-elle très faible avec la peau froide et moite, pouls à peine perceptible ?"},
+      {id:'allerg',q:"Y a-t-il une réaction allergique grave — gorge qui se serre, visage très enflé ?"},
+    ],
+  },
+  en:{
+    moi:[
+      {id:'resp',  q:"Are you having severe difficulty breathing, even at rest?"},
+      {id:'poitr', q:"Do you feel very strong chest pain spreading to your left arm or jaw?"},
+      {id:'consc', q:"Do you feel like you are about to lose consciousness?"},
+      {id:'allerg',q:"Are you having a severe allergic reaction — throat closing or very swollen face?"},
+      {id:'tremb', q:"Is your body shaking uncontrollably right now?"},
+    ],
+    autre:[
+      {id:'reveil',q:"Are they impossible to wake up or not responding to anything?"},
+      {id:'resp',  q:"Have they stopped breathing or are they having severe difficulty breathing?"},
+      {id:'tremb', q:"Is their body shaking uncontrollably right now?"},
+      {id:'choc',  q:"Are they very weak with cold clammy skin and a barely perceptible pulse?"},
+      {id:'allerg',q:"Is there a severe allergic reaction — throat closing or very swollen face?"},
+    ],
+  }
+};
+
+// ════════════════════════════════════════════════════════════
+//  DONNÉES HÔPITAUX (base de données établissements)
+// ════════════════════════════════════════════════════════════
+const HOPITAUX = [
+  {id:'E001',nom:'CHUM',nom_full:'CHUM — Centre Hospitalier de l\'Université de Montréal',
+   type:'urgence',addr:'1051 Rue Sanguinet, Ville-Marie',lat:45.5115,lon:-73.5590,
+   att_base:40,dist:1.3,sc:0.87,msss:'0006X',
+   specs:['Cardiologie','Neurologie','Chirurgie','Trauma','Oncologie','Psychiatrie','Médecine interne'],
+   heures:'24h / 7j',
+   achal_profil:[0.7,0.6,0.5,0.5,0.6,0.8,1.0,1.2,1.3,1.2,1.1,1.1,1.2,1.2,1.3,1.5,1.7,1.9,1.8,1.6,1.4,1.2,1.0,0.8]},
+  {id:'E002',nom:'Hôpital général juif',nom_full:'Hôpital général juif — Sir Mortimer B. Davis',
+   type:'urgence',addr:'3755 Ch. Côte-Sainte-Catherine, CDN',lat:45.4938,lon:-73.6335,
+   att_base:30,dist:5.4,sc:0.79,msss:'0011X',
+   specs:['Cardiologie','Chirurgie','Oncologie','Médecine interne','Gériatrie','Obstétrique'],
+   heures:'24h / 7j',
+   achal_profil:[0.6,0.5,0.4,0.4,0.5,0.7,0.9,1.1,1.2,1.1,1.0,1.0,1.1,1.2,1.3,1.5,1.6,1.8,1.7,1.5,1.3,1.1,0.9,0.7]},
+  {id:'E003',nom:'Sacré-Cœur',nom_full:'Hôpital du Sacré-Cœur de Montréal',
+   type:'urgence',addr:'5400 Boul. Gouin Ouest, Ahuntsic',lat:45.5385,lon:-73.7162,
+   att_base:35,dist:8.2,sc:0.68,msss:'0027X',
+   specs:['Trauma','Cardiologie','Pneumologie','Chirurgie','Médecine interne','Psychiatrie'],
+   heures:'24h / 7j',
+   achal_profil:[0.7,0.6,0.5,0.5,0.6,0.8,1.0,1.2,1.3,1.2,1.1,1.1,1.1,1.2,1.3,1.4,1.6,1.7,1.7,1.5,1.3,1.1,0.9,0.8]},
+  {id:'E004',nom:'Maisonneuve-Rosemont',nom_full:'Hôpital Maisonneuve-Rosemont',
+   type:'urgence',addr:'5415 Boul. de l\'Assomption, Rosemont',lat:45.5542,lon:-73.5583,
+   att_base:45,dist:4.8,sc:0.65,msss:'0015X',
+   specs:['Ophtalmologie','Hématologie','Oncologie','Médecine interne','Chirurgie'],
+   heures:'24h / 7j',
+   achal_profil:[0.6,0.5,0.4,0.4,0.5,0.7,0.9,1.1,1.2,1.1,1.0,1.0,1.1,1.2,1.2,1.4,1.6,1.8,1.7,1.5,1.3,1.1,0.9,0.7]},
+  {id:'E005',nom:'Hôpital général de Montréal',nom_full:'Hôpital général de Montréal (CUSM)',
+   type:'urgence',addr:'1650 Ave Cedar, Côte-des-Neiges',lat:45.4720,lon:-73.5993,
+   att_base:50,dist:3.1,sc:0.72,msss:'0018X',
+   specs:['Trauma','Cardiologie','Neurochirurgie','Chirurgie thoracique','Médecine interne'],
+   heures:'24h / 7j',
+   achal_profil:[0.7,0.6,0.5,0.5,0.6,0.8,1.0,1.2,1.3,1.2,1.1,1.1,1.2,1.3,1.4,1.6,1.7,1.8,1.7,1.5,1.3,1.1,0.9,0.8]},
+  {id:'E006',nom:'Clinique médicale 1851',nom_full:'Clinique médicale 1851',
+   type:'clinique',addr:'1851 Rue Sherbrooke Est, Plateau',lat:45.5239,lon:-73.5669,
+   att_base:20,dist:0.9,sc:0.91,msss:'',
+   specs:['Médecine générale','Soins courants','Ordonnances','Petite chirurgie'],
+   heures:'Lun-Ven 8h-21h | Sam 9h-18h | Dim 10h-17h',
+   achal_profil:[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.6,0.8,1.0,1.1,1.0,1.0,1.1,1.2,1.3,1.4,1.2,1.0,0.8,0.6,0.3,0.0,0.0]},
+  {id:'E007',nom:'GMF-U de Rosemont',nom_full:'GMF-U de Rosemont',
+   type:'gmf',addr:'2924 Boul. Rosemont, Rosemont',lat:45.5490,lon:-73.5905,
+   att_base:15,dist:3.2,sc:0.84,msss:'91072',
+   specs:['Médecine générale','Soins chroniques','Vaccination','Santé mentale légère'],
+   heures:'Lun-Ven 8h-20h | Sam 9h-17h',
+   achal_profil:[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.5,0.8,1.0,1.0,0.9,0.9,1.0,1.1,1.1,1.0,0.8,0.5,0.2,0.0,0.0,0.0,0.0]},
+  {id:'E008',nom:'811 — Télésanté Québec',nom_full:'811 — Info-Santé Québec',
+   type:'tel',addr:'Service téléphonique — partout au Québec',lat:45.5088,lon:-73.5878,
+   att_base:15,dist:0,sc:0.75,msss:'',
+   specs:['Consultation infirmière','Orientation vers soins','Toutes catégories','Conseils médicaux'],
+   heures:'24h / 7j',
+   achal_profil:[0.5,0.4,0.3,0.3,0.4,0.6,0.8,1.0,1.1,1.0,0.9,0.9,1.0,1.1,1.1,1.2,1.3,1.2,1.1,1.0,0.9,0.7,0.6,0.5]},
+  {id:'E009',nom:'Pharmaprix 24h',nom_full:'Pharmaprix Sainte-Catherine 24h',
+   type:'pharmacie',addr:'1500 Rue Sainte-Catherine O., Ville-Marie',lat:45.4949,lon:-73.5808,
+   att_base:5,dist:1.1,sc:0.95,msss:'',
+   specs:['Conseil pharmaceutique','Renouvellement ordonnance','Vaccination','Premiers soins'],
+   heures:'24h / 7j',
+   achal_profil:[0.2,0.1,0.1,0.1,0.2,0.3,0.5,0.8,1.0,1.0,0.9,0.9,1.0,1.0,1.0,1.1,1.2,1.1,1.0,0.9,0.7,0.5,0.4,0.3]},
+];
+
+// ════════════════════════════════════════════════════════════
+//  ACHALANDAGE — PROFILS HORAIRES
+// ════════════════════════════════════════════════════════════
+// Multiplicateurs par jour (0=dim...6=sam)
+const DAY_MULT = [1.1, 0.8, 0.9, 0.95, 1.0, 1.3, 1.2];
+
+function getAchalandage(hosp) {
+  const now = new Date();
+  const hour = now.getHours();
+  const day  = now.getDay();
+  const base = hosp.achal_profil[hour] || 1.0;
+  const mult = base * DAY_MULT[day];
+  const taux = Math.round(hosp.att_base * mult);
+  let level, cls;
+  if (mult < 0.8)       { level = t('achal-low');  cls = 'achal-low'; }
+  else if (mult < 1.3)  { level = t('achal-mid');  cls = 'achal-mid'; }
+  else                  { level = t('achal-high'); cls = 'achal-high'; }
+  return { taux, mult, level, cls };
+}
+
+function getAchalBar(hosp) {
+  // Retourne tableau 24h pour graphique
+  const day = new Date().getDay();
+  return hosp.achal_profil.map(v => Math.round(v * DAY_MULT[day] * 100));
+}
+
+// ════════════════════════════════════════════════════════════
+//  XGBOOST SIMULÉ — PRÉDICTION TEMPS DE SÉJOUR
+// ════════════════════════════════════════════════════════════
+// Basé sur les vraies distributions CTAS (ICIS, Stat Can)
+const SEJOUR_BASE = { 1:240, 2:210, 3:135, 4:90, 5:45 }; // minutes
+const CAT_MULT = {
+  Cardiaque:1.25, Neurologique:1.30, Respiratoire:1.10, Traumatisme:1.15,
+  Digestif:1.05, Infectieux:1.10, Métabolique:1.20, Psychiatrie:1.35,
+  Intoxication:1.40, Gynécologie:1.10, MSK:0.90, ORL:0.75,
+  Dentaire:0.70, Yeux:0.85, Administratif:0.60, default:1.0
+};
+
+function predictSejour(ctas, cat, hosp) {
+  const base  = SEJOUR_BASE[ctas] || 90;
+  const catM  = CAT_MULT[cat] || 1.0;
+  const achal = getAchalandage(hosp);
+  const achalM= Math.max(0.7, Math.min(1.8, achal.mult));
+  const now   = new Date();
+  const hour  = now.getHours();
+  // Nuit = légère réduction, soir peak = augmentation
+  const timeM = (hour >= 18 && hour <= 22) ? 1.15 : (hour >= 0 && hour <= 6) ? 0.85 : 1.0;
+
+  const total = Math.round(base * catM * achalM * timeM);
+
+  // Décomposition réaliste
+  const attente  = Math.round(total * 0.42);
+  const consult  = Math.round(total * 0.22);
+  const examens  = total - attente - consult;
+
+  // Confiance selon disponibilité des données
+  const conf = G.ext.intensite ? 82 : 68;
+
+  return { total, attente, consult, examens, conf };
+}
+
+function fmtMin(min) {
+  if (min < 60) return `${min} min`;
+  const h = Math.floor(min/60), m = min%60;
+  return m > 0 ? `${h}h${String(m).padStart(2,'0')}` : `${h}h`;
+}
+
+// ════════════════════════════════════════════════════════════
+//  DONNÉES RÉSULTAT
+// ════════════════════════════════════════════════════════════
+const URG_CFG = {
+  1:{cls:'u1',ico:'🚨',fr:['Situation critique — appelez le 911 maintenant','Ne vous déplacez pas seul'],en:['Critical situation — call 911 now','Do not travel alone']},
+  2:{cls:'u2',ico:'🔴',fr:['Votre situation nécessite une attention immédiate','Allez à l\'urgence dans les 15 minutes'],en:['Your situation requires immediate attention','Go to the ER within 15 minutes']},
+  3:{cls:'u3',ico:'🟠',fr:['Votre situation mérite une attention rapide','Consultez dans les 30 prochaines minutes'],en:['Your situation deserves prompt attention','Consult within the next 30 minutes']},
+  4:{cls:'u4',ico:'🟡',fr:['Votre situation est moins urgente','Vous pouvez consulter dans les prochaines heures'],en:['Your situation is less urgent','You can consult within the next few hours']},
+  5:{cls:'u5',ico:'🟢',fr:['Votre situation n\'est pas urgente','Une consultation de routine est suffisante'],en:['Your situation is not urgent','A routine consultation is sufficient']},
+};
+
+const CTAS_SC = {
+  Cardiaque:{c:2,p:{1:.05,2:.72,3:.18,4:.04,5:.01}},
+  Respiratoire:{c:3,p:{1:.02,2:.12,3:.68,4:.15,5:.03}},
+  Neurologique:{c:2,p:{1:.03,2:.65,3:.22,4:.08,5:.02}},
+  Traumatisme:{c:3,p:{1:.01,2:.15,3:.62,4:.18,5:.04}},
+  Digestif:{c:3,p:{1:.00,2:.05,3:.78,4:.15,5:.02}},
+  Infectieux:{c:3,p:{1:.01,2:.10,3:.65,4:.20,5:.04}},
+  Métabolique:{c:2,p:{1:.05,2:.55,3:.28,4:.10,5:.02}},
+  MSK:{c:4,p:{1:.00,2:.01,3:.14,4:.75,5:.10}},
+  ORL:{c:5,p:{1:.00,2:.01,3:.08,4:.25,5:.66}},
+  Psychiatrie:{c:3,p:{1:.02,2:.18,3:.55,4:.22,5:.03}},
+  Gynécologie:{c:3,p:{1:.02,2:.20,3:.58,4:.18,5:.02}},
+  Dentaire:{c:4,p:{1:.00,2:.08,3:.25,4:.60,5:.07}},
+  Intoxication:{c:2,p:{1:.15,2:.55,3:.22,4:.07,5:.01}},
+  Yeux:{c:3,p:{1:.01,2:.15,3:.60,4:.20,5:.04}},
+  Administratif:{c:5,p:{1:.00,2:.00,3:.05,4:.20,5:.75}},
+  default:{c:4,p:{1:.00,2:.05,3:.20,4:.62,5:.13}},
+};
+
+const CBAR = {1:'#C62828',2:'#E65100',3:'#F57F17',4:'#2E7D32',5:'#1565C0'};
+
+const TYPE_PILL = {
+  urgence:  {bg:'#FFCDD2',c:'#B71C1C',fr:'Urgence hospitalière',en:'Emergency room'},
+  clinique: {bg:'#FFF9C4',c:'#F57F17',fr:'Clinique sans RDV',en:'Walk-in clinic'},
+  gmf:      {bg:'#C8E6C9',c:'#1B5E20',fr:'GMF',en:'Family medicine'},
+  pharmacie:{bg:'#BBDEFB',c:'#0D47A1',fr:'Pharmacie',en:'Pharmacy'},
+  specialise:{bg:'#E1BEE7',c:'#4A148C',fr:'Clinique spécialisée',en:'Specialized clinic'},
+  tel:      {bg:'#B2EBF2',c:'#006064',fr:'811 Télésanté',en:'811 Telehealth'},
+};
+
+// Filtrage établissements par CTAS
+const CTAS_FILTER = {
+  urgence:  [1,2,3,4,5],
+  clinique: [3,4,5],
+  gmf:      [3,4,5],
+  pharmacie:[4,5],
+  specialise:[3,4,5],
+  tel:      [3,4,5],
+};
+
+function getCtas() {
+  const sc = CTAS_SC[G.ext.cat] || CTAS_SC.default;
+  let c = G.ext.ctasOverride || sc.c;
+  if (!G.ext.ctasOverride) {
+    if (G.ext.intensite >= 9) c = Math.min(c, 2);
+    if (G.ext.intensite !== null && G.ext.intensite <= 3) c = Math.max(c, 4);
+  }
+  return c;
+}
+
+// Recommandations traitement
+const TREAT_DATA = {
+  Cardiaque:[
+    {ico:'🏥',t:{fr:'Consultation médicale urgente',en:'Urgent medical consultation'},d:{fr:'Ne conduisez pas seul. Faites-vous accompagner ou appelez le 911.',en:'Do not drive alone. Have someone accompany you or call 911.'}},
+    {ico:'💊',t:{fr:'Aspirine si non allergique',en:'Aspirin if not allergic'},d:{fr:'325mg peut être indiqué en attendant les secours.',en:'325mg may be indicated while waiting for help.'}},
+    {ico:'🛌',t:{fr:'Repos immédiat',en:'Immediate rest'},d:{fr:'Asseyez-vous ou allongez-vous. Évitez tout effort physique.',en:'Sit or lie down. Avoid any physical exertion.'}},
+  ],
+  Neurologique:[
+    {ico:'⏱️',t:{fr:'Le temps est critique',en:'Time is critical'},d:{fr:'Pour un AVC suspect, chaque minute compte. Consultez immédiatement.',en:'For a suspected stroke, every minute counts. Seek care immediately.'}},
+    {ico:'🚫',t:{fr:'Rien par la bouche',en:'Nothing by mouth'},d:{fr:"Évitez de manger ou boire jusqu'à l'évaluation médicale.",en:'Avoid eating or drinking until medical evaluation.'}},
+  ],
+  Digestif:[
+    {ico:'💧',t:{fr:'Hydratation',en:'Hydration'},d:{fr:'Petites gorgées fréquentes si vous tolérez les liquides.',en:'Small frequent sips if you can tolerate fluids.'}},
+    {ico:'🍽️',t:{fr:'Diète légère',en:'Light diet'},d:{fr:"Évitez les aliments solides et produits laitiers jusqu'à amélioration.",en:'Avoid solid foods and dairy until improvement.'}},
+  ],
+  MSK:[
+    {ico:'🧊',t:{fr:'Glace 15-20 min',en:'Ice 15-20 min'},d:{fr:'Appliquez toutes les 2-3 heures pour réduire le gonflement.',en:'Apply every 2-3 hours to reduce swelling.'}},
+    {ico:'🦺',t:{fr:'Repos et élévation',en:'Rest and elevation'},d:{fr:"Élevez la zone blessée au-dessus du niveau du cœur si possible.",en:'Elevate the injured area above heart level if possible.'}},
+  ],
+  Infectieux:[
+    {ico:'💊',t:{fr:'Antipyrétique si fièvre',en:'Antipyretic if fever'},d:{fr:'Acétaminophène (Tylenol) selon les instructions.',en:'Acetaminophen (Tylenol) as directed.'}},
+    {ico:'💧',t:{fr:'Hydratation importante',en:'Important hydration'},d:{fr:'Buvez beaucoup de liquides clairs.',en:'Drink plenty of clear fluids.'}},
+  ],
+};
+
+// ════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════════════════════════
+function go(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  const el = document.getElementById('s'+n);
+  if (el) el.classList.add('on');
+  G.curScreen = n;
+  updProg(n);
+  window.scrollTo({top:0, behavior:'smooth'});
+  if (n === 3 && !G.chatReady) initChat();
+}
+
+function updProg(n) {
+  const wrap = document.getElementById('prog-wrap');
+  const row  = document.getElementById('prog-row');
+  const lbl  = document.getElementById('prog-lbl');
+  if (!wrap) return;
+  wrap.style.display = n === 0 ? 'none' : 'block';
+  row.innerHTML = '';
+  for (let i=1; i<=4; i++) {
+    const d = document.createElement('div');
+    d.className = 'prog-bar ' + (i < n ? 'done' : i === n ? 'now' : 'todo');
+    row.appendChild(d);
+  }
+  const steps = TR[G.lang].steps || TR.fr.steps;
+  lbl.textContent = `Étape ${Math.min(n,4)} / 4 — ${steps[n] || ''}`;
+}
+
+// ════════════════════════════════════════════════════════════
+//  LANGUE
+// ════════════════════════════════════════════════════════════
+function setLang(l) {
+  G.lang = l;
+  document.getElementById('lb-fr').classList.toggle('on', l==='fr');
+  document.getElementById('lb-en').classList.toggle('on', l==='en');
+  applyTR();
+  updProg(G.curScreen);
+}
+
+function applyTR() {
+  const ids = ['w-title','w-sub','w-btn','w-disc','s1-title','s1-sub','c-moi-t','c-moi-s',
+    'c-autre-t','c-autre-s','s2-title','s2-sub','crit-title','crit-sub','btn-911',
+    'btn-continue-anyway','s3-title','s3-sub','loc-title','s3-reco','chat-name','chat-status',
+    'lbl-obs','lbl-sejour','lbl-treat','lbl-recos','lbl-tech','disc-txt','btn-reset',
+    's2w-title','s2w-sub','warn-confirm-lbl','warn-proche-title','warn-alert-btn',
+    's2w-back','s2w-next'];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = t(id);
+  });
+  const inp = document.getElementById('chat-inp');
+  if (inp) inp.placeholder = isFr() ? 'Décrivez ce que vous ressentez...' : 'Describe how you feel...';
+  const loc = document.getElementById('loc-input');
+  if (loc) loc.placeholder = t('loc-ph');
+  const proche = document.getElementById('proche-tel');
+  if (proche) proche.placeholder = t('warn-proche-ph');
+  buildWarnList();
+  if (G.pourSoi !== null) buildQL();
+}
+
+// ════════════════════════════════════════════════════════════
+//  ÉCRAN 1
+// ════════════════════════════════════════════════════════════
+function pickWho(v) {
+  G.pourSoi = (v === 'moi');
+  document.getElementById('c-moi').classList.toggle('sel', v === 'moi');
+  document.getElementById('c-autre').classList.toggle('sel', v === 'autre');
+  document.getElementById('s1-next').disabled = false;
+}
+
+// ════════════════════════════════════════════════════════════
+//  ÉCRAN 2 — QUICK LOOK
+// ════════════════════════════════════════════════════════════
+function buildQL() {
+  const qs = QL[G.lang][G.pourSoi ? 'moi' : 'autre'] || [];
+  const list = document.getElementById('ql-list');
+  list.innerHTML = '';
+  G.qlSel = [];
+  document.getElementById('s2-next').disabled = true;
+
+  qs.forEach(q => {
+    const d = document.createElement('div');
+    d.className = 'ql-item';
+    d.id = 'qi-' + q.id;
+    d.innerHTML = `<div class="ql-check"><span class="ql-check-mark">✓</span></div><div class="ql-label">${q.q}</div>`;
+    d.onclick = () => toggleQL(q.id, d, false);
+    list.appendChild(d);
+  });
+
+  // Option aucune
+  const none = document.createElement('div');
+  none.className = 'ql-item none-opt';
+  none.id = 'qi-aucune';
+  none.innerHTML = `<div class="ql-check"><span class="ql-check-mark">✓</span></div><div class="ql-label">${t('ql-none')}</div>`;
+  none.onclick = () => toggleQL('aucune', none, true);
+  list.appendChild(none);
+}
+
+function toggleQL(id, el, isNone) {
+  document.getElementById('crit-alert').classList.remove('on');
+  G.showAlert = false;
+
+  if (isNone) {
+    G.qlSel = ['aucune'];
+    document.querySelectorAll('.ql-item').forEach(i => i.classList.remove('sel'));
+    el.classList.add('sel');
+  } else {
+    const noneEl = document.getElementById('qi-aucune');
+    if (noneEl) noneEl.classList.remove('sel');
+    G.qlSel = G.qlSel.filter(x => x !== 'aucune');
+    if (G.qlSel.includes(id)) {
+      G.qlSel = G.qlSel.filter(x => x !== id);
+      el.classList.remove('sel');
+    } else {
+      G.qlSel.push(id);
+      el.classList.add('sel');
+    }
+  }
+  document.getElementById('s2-next').disabled = G.qlSel.length === 0;
+}
+
+function checkQL() {
+  const hasCrit = G.qlSel.some(x => x !== 'aucune');
+  if (hasCrit) {
+    document.getElementById('crit-alert').classList.add('on');
+    G.showAlert = true;
+  } else {
+    goWarn();
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  ÉCRAN 2W — AVERTISSEMENT
+// ════════════════════════════════════════════════════════════
+const WARN_ITEMS = {
+  fr:[
+    {ico:'🥶', txt:"Peau froide, moite ou décolorée"},
+    {ico:'🫀', txt:"Signes d'un problème cardiaque (douleur poitrine, bras gauche, mâchoire)"},
+    {ico:'🧠', txt:"Signes d'un AVC (faiblesse soudaine d'un côté, difficulté à parler)"},
+    {ico:'💭', txt:"Idées suicidaires ou envie de se faire du mal"},
+    {ico:'😮', txt:"Difficulté à respirer au repos"},
+    {ico:'⚡', txt:"Fatigue extrême apparue soudainement"},
+    {ico:'🩸', txt:"Saignement important qui ne s'arrête pas"},
+    {ico:'⚠️', txt:"Crise de convulsions (corps qui tremble de façon incontrôlable)"},
+    {ico:'🤧', txt:"Enflement rapide des lèvres ou de la gorge"},
+  ],
+  en:[
+    {ico:'🥶', txt:"Cold, clammy or discoloured skin"},
+    {ico:'🫀', txt:"Signs of a heart problem (chest pain, left arm, jaw)"},
+    {ico:'🧠', txt:"Signs of a stroke (sudden weakness on one side, difficulty speaking)"},
+    {ico:'💭', txt:"Suicidal thoughts or urge to harm yourself"},
+    {ico:'😮', txt:"Difficulty breathing at rest"},
+    {ico:'⚡', txt:"Extreme sudden fatigue"},
+    {ico:'🩸', txt:"Significant bleeding that won't stop"},
+    {ico:'⚠️', txt:"Seizure (body shaking uncontrollably)"},
+    {ico:'🤧', txt:"Rapid swelling of lips or throat"},
+  ]
+};
+
+function buildWarnList() {
+  const list = document.getElementById('warn-list');
+  if (!list) return;
+  const items = WARN_ITEMS[G.lang] || WARN_ITEMS.fr;
+  list.innerHTML = items.map(item =>
+    `<div class="warn-item"><span class="warn-item-ico">${item.ico}</span><span>${item.txt}</span></div>`
+  ).join('');
+}
+
+function goWarn() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  document.getElementById('s2w').classList.add('on');
+  G.curScreen = 2;
+  updProg(2);
+  buildWarnList();
+  const cb = document.getElementById('warn-confirm');
+  if (cb) cb.checked = false;
+  document.getElementById('s2w-next').disabled = true;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function toggleWarnBtn() {
+  const cb = document.getElementById('warn-confirm');
+  document.getElementById('s2w-next').disabled = !cb.checked;
+}
+
+function alerterProche() {
+  const tel = document.getElementById('proche-tel').value.trim();
+  if (!tel) return;
+  const msg = isFr()
+    ? "Bonjour, j'utilise OrientIA MTL pour évaluer mon état de santé. Je voulais t'en informer."
+    : "Hello, I'm using OrientIA MTL to assess my health condition. I wanted to let you know.";
+  window.location.href = 'sms:' + tel + '?body=' + encodeURIComponent(msg);
+}
+
+// ════════════════════════════════════════════════════════════
+//  LOCALISATION
+// ════════════════════════════════════════════════════════════
+function onPostalInput(inp) {
+  let v = inp.value.replace(/[^A-Za-z0-9]/g,'').toUpperCase();
+  if (v.length > 3) v = v.slice(0,3) + ' ' + v.slice(3,6);
+  inp.value = v;
+  const status = document.getElementById('loc-status');
+  if (v.replace(' ','').length === 6) {
+    G.localisation.codePostal = v;
+    G.localisation.source = 'postal';
+    // Géocodage simulé pour Montréal
+    const coords = getCoordsByPostal(v);
+    if (coords) {
+      G.localisation.lat = coords.lat;
+      G.localisation.lon = coords.lon;
+      status.className = 'loc-status ok';
+      status.textContent = isFr() ? `✅ Localisation définie — ${v}` : `✅ Location set — ${v}`;
+      recalcDistances();
+    }
+  } else {
+    G.localisation.lat = null;
+    status.className = 'loc-status';
+    status.textContent = '';
+  }
+}
+
+function getCoordsByPostal(cp) {
+  // Mapping simplifié des premières lettres → zones Montréal
+  const zone = cp.slice(0,3).toUpperCase();
+  const zones = {
+    'H2X':{lat:45.5124,lon:-73.5700},'H2Y':{lat:45.5050,lon:-73.5650},
+    'H3A':{lat:45.5020,lon:-73.5800},'H3B':{lat:45.5000,lon:-73.5750},
+    'H3C':{lat:45.4900,lon:-73.5500},'H3G':{lat:45.4720,lon:-73.5993},
+    'H3H':{lat:45.4950,lon:-73.5800},'H3T':{lat:45.4950,lon:-73.6200},
+    'H2K':{lat:45.5250,lon:-73.5500},'H2L':{lat:45.5200,lon:-73.5650},
+    'H1T':{lat:45.5600,lon:-73.5550},'H1Y':{lat:45.5500,lon:-73.5900},
+    'H4A':{lat:45.4750,lon:-73.6100},'H4B':{lat:45.4700,lon:-73.6300},
+    'H4G':{lat:45.4600,lon:-73.5750},'H4H':{lat:45.4500,lon:-73.5850},
+    'H4W':{lat:45.4700,lon:-73.6700},'H8P':{lat:45.4300,lon:-73.6400},
+  };
+  return zones[zone] || {lat:45.5088, lon:-73.5878}; // défaut centre Montréal
+}
+
+function getGPS() {
+  const btn = document.getElementById('btn-gps');
+  const status = document.getElementById('loc-status');
+  if (!navigator.geolocation) {
+    status.className = 'loc-status err';
+    status.textContent = isFr() ? 'GPS non disponible sur ce navigateur.' : 'GPS not available on this browser.';
+    return;
+  }
+  btn.classList.add('loading');
+  status.className = 'loc-status';
+  status.textContent = isFr() ? '📡 Localisation en cours...' : '📡 Getting location...';
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      G.localisation.lat = pos.coords.latitude;
+      G.localisation.lon = pos.coords.longitude;
+      G.localisation.source = 'gps';
+      btn.classList.remove('loading');
+      status.className = 'loc-status ok';
+      status.textContent = isFr()
+        ? `✅ Position GPS détectée (±${Math.round(pos.coords.accuracy)}m)`
+        : `✅ GPS position detected (±${Math.round(pos.coords.accuracy)}m)`;
+      recalcDistances();
+    },
+    err => {
+      btn.classList.remove('loading');
+      status.className = 'loc-status err';
+      status.textContent = isFr() ? 'Accès GPS refusé. Entrez votre code postal.' : 'GPS access denied. Enter your postal code.';
+    }
+  );
+}
+
+function haversine(lat1,lon1,lat2,lon2) {
+  const R=6371, dLat=(lat2-lat1)*Math.PI/180, dLon=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+function recalcDistances() {
+  if (!G.localisation.lat) return;
+  HOPITAUX.forEach(h => {
+    if (h.type !== 'tel') {
+      h.dist = Math.round(haversine(G.localisation.lat,G.localisation.lon,h.lat,h.lon)*10)/10;
+    }
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+//  CHAT
+// ════════════════════════════════════════════════════════════
+const SYSPROMPT_KEY = 'sysprompt_v5';
+
+async function initChat() {
+  G.chatReady = true;
+  G.hist = [];
+  addBotMsg(isFr()
+    ? "Bonjour ! Sélectionnez d'abord la catégorie de symptôme, puis le symptôme précis."
+    : "Hello! First select the symptom category, then the specific symptom.");
+  addCatSelect();
+}
+
+async function callBot(userMsg) {
+  G.waiting = true;
+  document.getElementById('btn-send').disabled = true;
+  const tid = addTyping();
+
+  async function tryGroq(attempt) {
+    const messages = [
+      { role: 'system', content: getSysPrompt() },
+      ...G.hist,
+      { role: 'user', content: userMsg }
+    ];
+    const groqResp = await fetch(GROQ_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + (window._groqKey || GROQ_API_KEY),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        messages: messages,
+        temperature: 0.3,
+        max_tokens: 512
+      })
+    });
+    if (groqResp.status === 429) {
+      const errData = await groqResp.json().catch(() => ({}));
+      const retryMsg = errData?.error?.message || '';
+      const waitMatch = retryMsg.match(/try again in ([\d.]+)s/);
+      const waitSec = waitMatch ? Math.ceil(parseFloat(waitMatch[1])) + 1 : 15;
+      if (attempt < 2) {
+        var remaining = waitSec;
+        var statusEl = document.getElementById('chat-status');
+        await new Promise(resolve => {
+          var countdownId = setInterval(function() {
+            if (statusEl) statusEl.textContent = isFr()
+              ? 'Reconnexion dans ' + remaining + 's...'
+              : 'Reconnecting in ' + remaining + 's...';
+            remaining--;
+            if (remaining < 0) {
+              clearInterval(countdownId);
+              if (statusEl) statusEl.textContent = isFr()
+                ? 'En ligne · Français & English'
+                : 'Online · Français & English';
+              resolve();
+            }
+          }, 1000);
+        });
+        return tryGroq(attempt + 1);
+      }
+      throw new Error('429 après 2 tentatives');
+    }
+    if (!groqResp.ok) throw new Error('Groq API error ' + groqResp.status);
+    return groqResp.json();
+  }
+
+  try {
+    const groqData = await tryGroq(0);
+    var raw = groqData.choices[0].message.content.trim();
+    rmTyping(tid);
+    G.hist.push({role:'user', content:userMsg});
+    G.hist.push({role:'assistant', content:raw});
+    processBot(raw);
+  } catch(e) {
+    console.error('[OrientIA] Groq error:', e.message);
+    rmTyping(tid);
+    addBotMsg(isFr()
+      ? 'Service momentanément indisponible. Veuillez réessayer.'
+      : 'Service momentarily unavailable. Please try again.');
+  }
+  G.waiting = false;
+  document.getElementById('btn-send').disabled = false;
+}
+
+function processBot(raw) {
+  let text = raw;
+  const cm = raw.match(/\[CHIPS:\s*([^\]]+)\]/);
+  let chips = [];
+  if (cm) { chips = cm[1].split('|').map(s=>s.trim()).filter(Boolean); text = text.replace(cm[0],'').trim(); }
+  const em = raw.match(/\[EVAL:\s*([^\]]+)\]/);
+  if (em) { text = text.replace(em[0],'').trim(); parseEval(em[1]); }
+  addBotMsg(text);
+  if (em) {
+    setTimeout(() => {
+      addBotMsg(isFr()
+        ? "✅ Merci ! Avez-vous accès à des signes vitaux ? Entrez ceux que vous connaissez ou ignorez."
+        : "✅ Thank you! Do you have access to vital signs? Enter what you know or skip.");
+      addVitauxInline();
+    }, 400);
+  } else if (chips.length > 0) {
+    addChips(chips);
+  }
+}
+
+function parseEval(str) {
+  const PIDMAP = {
+    P1_01:'Cardiaque',P1_08:'Cardiaque',P1_09:'Infectieux',P1_10:'Respiratoire',P1_11:'Cardiaque',
+    P1_12:'Traumatisme',P1_13:'Métabolique',P1_14:'Intoxication',P2_01:'Cardiaque',
+    P2_02:'Neurologique',P2_03:'Respiratoire',P2_04:'Traumatisme',P2_05:'Métabolique',
+    P2_06:'Métabolique',P2_07:'Infectieux',P2_08:'Gynécologie',P2_09:'Psychiatrie',
+    P2_10:'Infectieux',P2_11:'Cardiaque',P2_12:'Neurologique',P2_13:'Intoxication',
+    P2_14:'Yeux',P2_15:'Cardiaque',P2_16:'Gynécologie',P3_01:'Cardiaque',
+    P3_02:'Respiratoire',P3_03:'Digestif',P3_04:'Neurologique',P3_05:'Traumatisme',
+    P3_06:'Infectieux',P3_07:'Urinaire',P3_08:'Gynécologie',P3_09:'Cardiaque',
+    P3_10:'Neurologique',P3_11:'Neurologique',P3_12:'Psychiatrie',P3_13:'MSK',
+    P3_14:'Intoxication',P3_15:'Yeux',P3_16:'Gynécologie',P3_17:'Cardiaque',P3_18:'Dentaire',
+    P4_01:'Digestif',P4_02:'ORL',P4_03:'MSK',P4_04:'Dermatologie',P4_05:'ORL',
+    P4_06:'Respiratoire',P4_07:'Neurologique',P4_08:'Psychiatrie',P4_09:'MSK',
+    P4_10:'Yeux',P4_11:'Gynécologie',P4_12:'Dentaire',P4_13:'Cardiaque',P4_14:'MSK',
+    P5_01:'Administratif',P5_02:'Dermatologie',P5_03:'MSK',P5_04:'ORL',P5_05:'MSK',
+    P5_06:'Yeux',P5_07:'Dentaire',P5_08:'Psychiatrie',
+  };
+  str.split(',').forEach(p => {
+    const [k,v] = (p||'').split('=').map(s=>s.trim());
+    if (k==='pid') { G.ext.pid=v; G.ext.cat=PIDMAP[v]||'default'; }
+    if (k==='ctas') G.ext.ctasOverride = parseInt(v)||null;
+    if (k==='int')  G.ext.intensite = parseInt(v)||null;
+    if (k==='dur')  G.ext.duree = v;
+    if (k==='flags') G.ext.flags = (v||'').split(';').map(s=>s.trim()).filter(Boolean);
+  });
+}
+
+// Affichage messages
+function addBotMsg(text) {
+  const wrap = document.getElementById('chat-msgs');
+  const d = document.createElement('div');
+  d.className = 'msg bot';
+  d.innerHTML = `<div class="msg-av">🤖</div><div class="msg-bub">${text.replace(/\n/g,'<br>')}</div>`;
+  wrap.appendChild(d);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+function addUserMsg(text) {
+  const wrap = document.getElementById('chat-msgs');
+  const d = document.createElement('div');
+  d.className = 'msg usr';
+  d.innerHTML = `<div class="msg-bub">${text}</div><div class="msg-av">🙋</div>`;
+  wrap.appendChild(d);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+let tc = 0;
+function addTyping() {
+  const id = 'ty'+(++tc);
+  const wrap = document.getElementById('chat-msgs');
+  const d = document.createElement('div');
+  d.className = 'msg bot'; d.id = id;
+  d.innerHTML = `<div class="msg-av">🤖</div><div class="typing-dots"><span></span><span></span><span></span></div>`;
+  wrap.appendChild(d);
+  wrap.scrollTop = wrap.scrollHeight;
+  return id;
+}
+function rmTyping(id) { const e=document.getElementById(id); if(e) e.remove(); }
+
+// Dropdowns catégories/symptômes
+const usedDrops = {};
+function addCatSelect() {
+  const uid = 'cat-'+(++tc);
+  const wrap = document.getElementById('chat-msgs');
+  const d = document.createElement('div');
+  d.className = 'select-wrap';
+  const sel = document.createElement('select');
+  sel.className = 'chat-select'; sel.id = uid;
+  sel.innerHTML = `<option value="">${t('cat-ph')}</option>` +
+    CATS[G.lang].map(c=>`<option value="${c.id}">${c.ico}  ${c.label}</option>`).join('');
+  sel.onchange = () => {
+    if (!sel.value) return;
+    sel.disabled = true; sel.style.opacity = '.5';
+    usedDrops[uid] = true;
+    const cat = CATS[G.lang].find(c=>c.id===sel.value);
+    if (!cat) return;
+    G.ext.cat = cat.id;
+    addUserMsg(`${cat.ico} ${cat.label}`);
+    addBotMsg(isFr()
+      ? `Quel symptôme dans "${cat.label}" correspond le mieux à votre situation ?`
+      : `Which symptom in "${cat.label}" best matches your situation?`);
+    addSymSelect(cat);
+  };
+  d.appendChild(sel);
+  wrap.appendChild(d);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function addSymSelect(cat) {
+  const uid = 'sym-'+(++tc);
+  const wrap = document.getElementById('chat-msgs');
+  const d = document.createElement('div');
+  d.className = 'select-wrap';
+  const sel = document.createElement('select');
+  sel.className = 'chat-select'; sel.id = uid;
+  sel.innerHTML = `<option value="">${t('sym-ph')}</option>` +
+    cat.symptoms.map(s=>`<option value="${s}">${s}</option>`).join('');
+  sel.onchange = () => {
+    if (!sel.value) return;
+    sel.disabled = true; sel.style.opacity = '.5';
+    G.ext.flags.push(sel.value);
+    addUserMsg(sel.value);
+    const ctx = `Catégorie: ${cat.id}. Symptôme: ${sel.value}. Continue le triage (durée, intensité, modificateurs). [CHIPS:...] et [EVAL:...] obligatoires.`;
+    callBot(ctx);
+  };
+  d.appendChild(sel);
+  wrap.appendChild(d);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function addChips(arr) {
+  const wrap = document.getElementById('chat-msgs');
+  const d = document.createElement('div');
+  d.className = 'chips-row';
+  arr.forEach(label => {
+    const btn = document.createElement('button');
+    btn.className = 'chip'; btn.textContent = label;
+    btn.onclick = () => {
+      d.querySelectorAll('.chip').forEach(c => c.disabled = true);
+      addUserMsg(label);
+      callBot(label);
+    };
+    d.appendChild(btn);
+  });
+  wrap.appendChild(d);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function addVitauxInline() {
+  const uid = 'vit-'+(++tc);
+  const wrap = document.getElementById('chat-msgs');
+  const d = document.createElement('div');
+  d.className = 'vit-inline';
+  const fields = [
+    {k:'spo2',   l:isFr()?'Saturation (SpO2)':'Oxygen saturation',  u:'%',     p:'98'},
+    {k:'tension',l:isFr()?'Tension artérielle':'Blood pressure',     u:'mmHg',  p:'120'},
+    {k:'fc',     l:isFr()?'Fréquence cardiaque':'Heart rate',        u:'bpm',   p:'75'},
+    {k:'temp',   l:isFr()?'Température':'Temperature',               u:'°C',    p:'37.0'},
+    {k:'glyc',   l:isFr()?'Glycémie':'Blood sugar',                  u:'mmol/L',p:'5.5'},
+  ];
+  let html = `<div class="vit-table"><div class="vit-hdr">${t('vit-hdr')}</div>`;
+  fields.forEach(f => {
+    html += `<div class="vit-row">
+      <div class="vit-lbl">${f.l}</div>
+      <span class="vit-unit">${f.u}</span>
+      <input class="vit-inp" type="number" id="${uid}-${f.k}" placeholder="${f.p}">
+    </div>`;
+  });
+  html += `<div class="vit-footer">
+    <button class="btn-vit-skip" onclick="skipVit('${uid}')">${t('vit-skip')}</button>
+    <button class="btn-vit-ok"   onclick="submitVit('${uid}')">${t('vit-ok')}</button>
+  </div></div>`;
+  d.innerHTML = html;
+  wrap.appendChild(d);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function submitVit(uid) {
+  document.querySelectorAll(`[id^="${uid}"]`).forEach(el => el.disabled = true);
+  const keys = ['spo2','tension','fc','temp','glyc'];
+  const vals = {};
+  keys.forEach(k => {
+    const el = document.getElementById(`${uid}-${k}`);
+    vals[k] = el ? el.value : '';
+  });
+  G.vitaux = vals;
+  const parts = [];
+  if(vals.spo2)    parts.push(`SpO2 ${vals.spo2}%`);
+  if(vals.tension) parts.push(`Tension ${vals.tension} mmHg`);
+  if(vals.fc)      parts.push(`FC ${vals.fc} bpm`);
+  if(vals.temp)    parts.push(`Temp ${vals.temp}°C`);
+  if(vals.glyc)    parts.push(`Glycémie ${vals.glyc} mmol/L`);
+  addUserMsg(parts.length > 0 ? parts.join(' · ') : (isFr() ? 'Aucune valeur' : 'No values'));
+  go(4); buildResult();
+}
+function skipVit(uid) {
+  document.querySelectorAll(`[id^="${uid}"]`).forEach(el => el.disabled = true);
+  addUserMsg(isFr() ? 'Passer au résultat' : 'Skip to result');
+  go(4); buildResult();
+}
+
+function sendMsg() {
+  const inp = document.getElementById('chat-inp');
+  const txt = inp.value.trim();
+  if (!txt || G.waiting) return;
+  inp.value = ''; inp.style.height = 'auto';
+  addUserMsg(txt);
+  callBot(txt);
+}
+function onKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();} }
+function resize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,90)+'px'; }
+
+// ════════════════════════════════════════════════════════════
+//  SYSTEM PROMPT (inline — base CTAS complète)
+// ════════════════════════════════════════════════════════════
+function getSysPrompt() {
+  return `Tu es l'assistant de triage médical de OrientIA MTL, un système d'orientation intelligent pour les urgences de Montréal.
+
+TON RÔLE : Identifier la plainte du patient, évaluer son niveau d'urgence CTAS (1 à 5), et préparer les données pour orienter vers le bon point de service.
+
+RÈGLES ABSOLUES :
+- Langage patient uniquement. JAMAIS de termes médicaux (dyspnée, tachycardie, GCS, SIRS, etc.)
+- UNE seule question à la fois. Maximum 2-3 phrases par message.
+- Détecte automatiquement la langue (français/anglais) et réponds dans la même langue.
+- Ne mentionne JAMAIS le niveau CTAS à l'utilisateur.
+- Ne pose JAMAIS de diagnostic. Sois chaleureux et rassurant.
+
+PROFIL DU PATIENT :
+- Âge : ${G.ageGroup || 'Non précisé'}
+- Sexe biologique : ${G.sexe || 'Non précisé'}
+
+RÈGLES CLINIQUES LIÉES AU PROFIL :
+- Si âge = "Moins de 1 an" et fièvre présente → CTAS 2 automatique
+- Si âge = "Moins de 1 an" → toute présentation est au minimum CTAS 3
+- Si âge = "75 ans et plus" et symptômes cardiovasculaires ou neurologiques → élever d'un niveau CTAS
+- Si âge = "75 ans et plus" → les personnes âgées peuvent présenter des symptômes atypiques
+- Si sexe = "Femme" et catégorie cardiovasculaire → les femmes présentent souvent des symptômes cardiovasculaires atypiques sans douleur thoracique classique
+
+FORMAT OBLIGATOIRE :
+Après chaque message ajoute : [CHIPS: option1 | option2 | option3 | option4]
+Quand tu as assez d'info (plainte + intensité + durée), ajoute : [EVAL: pid=P3_03, ctas=3, int=7, dur=3h, flags=douleur_abdominale;vomissements]
+
+ORDRE : 1) Quoi ? 2) Depuis combien de temps ? 3) Intensité /10 ? 4) 1-2 questions clés 5) EVAL
+
+BASE CTAS — PRÉSENTATIONS :
+── CTAS 1 — IMMÉDIAT ──
+P1_01|CTAS 1|Arrêt cardiaque|La personne ne respire plus et ne répond pas
+P1_02|CTAS 1|Arrêt respiratoire|Elle a arrêté de respirer complètement
+P1_03|CTAS 1|Inconscient profond|Impossible à réveiller, ne réagit à rien
+P1_04|CTAS 1|Convulsion prolongée|Le corps tremble de façon incontrôlable depuis plus de 5 minutes
+P1_05|CTAS 1|Polytraumatisme majeur|Accident très grave avec blessures multiples
+P1_06|CTAS 1|Traumatisme crânien grave|Coup fort à la tête, ne répond presque plus
+P1_07|CTAS 1|Brûlure majeure|Brûlure très étendue sur le corps ou inhalation de fumée
+P1_08|CTAS 1|Choc|Très faible, peau froide et moite, pouls à peine perceptible
+P1_09|CTAS 1|Choc septique|Forte fièvre + très confus + très faible
+P1_10|CTAS 1|Détresse respiratoire sévère|Lèvres ou ongles bleutés, ne peut pas prononcer une phrase
+P1_11|CTAS 1|Anaphylaxie sévère|Gorge qui se ferme, visage très enflé
+P1_12|CTAS 1|Hémorragie massive|Saignement abondant qui ne s'arrête pas
+P1_13|CTAS 1|Hypoglycémie sévère|Diabétique inconscient ou en crise
+P1_14|CTAS 1|Surdose avec perte conscience|A pris trop de médicaments et ne répond plus
+P1_15|CTAS 1|Agitation extrême|Comportement violent ou dangereux
+── CTAS 2 — TRÈS URGENT ──
+P2_01|CTAS 2|Douleur thoracique SCA|Douleur forte à la poitrine avec sueurs ou douleur dans le bras gauche
+P2_02|CTAS 2|AVC suspect|Faiblesse soudaine d'un côté ou difficulté à parler
+P2_03|CTAS 2|Dyspnée modérée|Très essoufflé au repos, ne peut parler qu'en quelques mots
+P2_04|CTAS 2|Trauma à haut risque|Accident important, chute de hauteur
+P2_05|CTAS 2|Hypoglycémie symptomatique|Diabétique avec tremblements et confusion
+P2_06|CTAS 2|Hyperglycémie symptomatique|Diabétique avec soif extrême et respiration rapide
+P2_07|CTAS 2|Sepsis suspect|Fièvre élevée + très faible + confusion
+P2_08|CTAS 2|Saignement grossesse|Enceinte avec saignement abondant
+P2_09|CTAS 2|Idées suicidaires actives|Envie de se faire du mal avec un plan précis
+P2_10|CTAS 2|Fièvre nourrisson <3 mois|Bébé de moins de 3 mois avec de la fièvre
+P2_11|CTAS 2|Syncope avec traumatisme|A perdu connaissance et est tombé
+P2_12|CTAS 2|Confusion aiguë|Soudainement confus, ne sait plus où il est
+P2_13|CTAS 2|Surdose consciente|A pris trop de médicaments, encore éveillé
+P2_14|CTAS 2|Perte vision soudaine|A perdu la vision d'un œil soudainement
+P2_15|CTAS 2|Palpitations instables|Cœur qui bat très vite + étourdissements importants
+P2_16|CTAS 2|Douleur pelvienne aiguë|Douleur très forte dans le bas-ventre
+── CTAS 3 — URGENT ──
+P3_01|CTAS 3|Douleur thoracique atypique|Nouvelle douleur à la poitrine inhabituellement
+P3_02|CTAS 3|Dyspnée légère|Essoufflé en marchant mais peut parler normalement
+P3_03|CTAS 3|Douleur abdominale aiguë|Mal de ventre intense depuis plusieurs heures
+P3_04|CTAS 3|Céphalée sévère|Pire mal de tête de ma vie
+P3_05|CTAS 3|Fracture suspectée|Je pense que c'est cassé, déformation visible
+P3_06|CTAS 3|Fièvre maladie chronique|Fièvre avec diabète, cancer, greffe ou VIH
+P3_07|CTAS 3|Colique néphrétique|Douleur intense dans le flanc comme une vague
+P3_08|CTAS 3|Douleur grossesse|Enceinte avec douleurs ou contractions inhabituelles
+P3_09|CTAS 3|Palpitations isolées|Cœur qui bat irrégulièrement sans perte de connaissance
+P3_10|CTAS 3|Vertiges intenses|La pièce tourne fort, impossible de marcher droit
+P3_11|CTAS 3|Engourdissement unilatéral|Un côté du visage ou un membre engourdi
+P3_12|CTAS 3|Agitation modérée|Très agité mais pas de danger immédiat
+P3_13|CTAS 3|Douleur dorsale aiguë|Mal de dos intense avec engourdissement
+P3_14|CTAS 3|Intoxication légère|A ingéré substance potentiellement dangereuse
+P3_15|CTAS 3|Douleur oculaire intense|Douleur très forte dans un œil
+P3_16|CTAS 3|Saignement vaginal abondant|Saignements vaginaux très abondants
+P3_17|CTAS 3|HTA symptomatique|Tension très élevée avec maux de tête et vision trouble
+P3_18|CTAS 3|Abcès dentaire fièvre|Douleur dentaire forte avec fièvre
+── CTAS 4 — MOINS URGENT ──
+P4_01|CTAS 4|Vomissements simples|Je vomis mais je peux encore boire
+P4_02|CTAS 4|Infection urinaire|Brûlures en urinant, pas de fièvre
+P4_03|CTAS 4|Entorse|Cheville ou poignet tordu, douleur modérée
+P4_04|CTAS 4|Plaie superficielle|Petite coupure qui pourrait nécessiter des points
+P4_05|CTAS 4|Otite simple|Douleur à l'oreille
+P4_06|CTAS 4|Toux simple|Toux depuis quelques jours sans détresse
+P4_07|CTAS 4|Vertiges légers|Légère sensation de vertige, stable
+P4_08|CTAS 4|Crise d'anxiété|Crise de panique, cœur rapide, souffle court
+P4_09|CTAS 4|Lombalgie aiguë|Mal de dos fort, sans engourdissement
+P4_10|CTAS 4|Corps étranger oculaire|Quelque chose dans l'œil, larmoiement
+P4_11|CTAS 4|Douleur pelvienne modérée|Douleur dans le bas-ventre modérée
+P4_12|CTAS 4|Douleur dentaire|Forte douleur dentaire sans fièvre
+P4_13|CTAS 4|Palpitations légères|Cœur qui bat un peu vite, occasionnel
+P4_14|CTAS 4|Douleur articulaire|Articulation gonflée et douloureuse
+── CTAS 5 — NON URGENT ──
+P5_01|CTAS 5|Renouvellement ordonnance|Besoin de renouveler une ordonnance
+P5_02|CTAS 5|Éruption bénigne|Petite rougeur légère sans fièvre
+P5_03|CTAS 5|Douleur chronique stable|Douleur chronique connue sans changement
+P5_04|CTAS 5|Rhume simple|Rhume ordinaire
+P5_05|CTAS 5|Lombalgie chronique|Mal de dos chronique habituel
+P5_06|CTAS 5|Œil rouge|Œil rouge sans douleur
+P5_07|CTAS 5|Suivi dentaire|Légère douleur après soin dentaire
+P5_08|CTAS 5|Anxiété chronique|Anxiété habituelle stable
+
+MODIFICATEURS GÉNÉRAUX (override immédiat) :
+MG_01 → Impossible à réveiller → CTAS 1 OVERRIDE
+MG_02 → A arrêté de respirer → CTAS 1 OVERRIDE
+MG_03 → Corps tremble incontrôlable → CTAS 1 OVERRIDE
+MG_04 → Peau froide moite pouls faible → CTAS 2 OVERRIDE
+MG_05 → Soudainement confus désorienté → CTAS 2 OVERRIDE
+MG_06 → Douleur 9-10/10 → CTAS 2 hausse
+MG_07 → Saignement abondant incontrolable → CTAS 2 OVERRIDE
+MG_08 → Très essoufflé ne peut parler que quelques mots → CTAS 2 OVERRIDE
+MG_09 → Réaction allergique grave gorge qui se serre → CTAS 1 OVERRIDE
+MG_10 → A avalé substance dangereuse → CTAS 2 OVERRIDE
+MG_11 → Douleur brutale pire de sa vie → CTAS 2 OVERRIDE
+
+SEUILS PHYSIOLOGIQUES :
+SpO2 < 90% → CTAS 1 | SpO2 90-92% → CTAS 2 | Tension < 90 mmHg → CTAS 1
+Tension > 220 mmHg avec symptômes → CTAS 2 | FC > 130 bpm → CTAS 2
+Temp >= 38.5°C avec immunosuppression → CTAS 2 | Glycémie < 3.0 → CTAS 2
+Glycémie > 18.0 → CTAS 2 | FR > 28/min → CTAS 2`;
+}
+
+// ════════════════════════════════════════════════════════════
+//  RÉSULTAT
+// ════════════════════════════════════════════════════════════
+function buildResult() {
+  const ctas = getCtas();
+  const cat  = G.ext.cat || 'default';
+  const sc   = CTAS_SC[cat] || CTAS_SC.default;
+  const u    = URG_CFG[ctas];
+  const lbl  = isFr() ? u.fr : u.en;
+
+  // Banner
+  const banner = document.getElementById('urg-banner');
+  banner.className = 'urg-banner ' + u.cls;
+  document.getElementById('urg-ico').textContent   = u.ico;
+  document.getElementById('urg-title').textContent = lbl[0];
+  document.getElementById('urg-delay').textContent = lbl[1];
+
+  // Observations
+  const int   = G.ext.intensite ? `${G.ext.intensite}/10` : t('np');
+  const dur   = G.ext.duree || t('np');
+  const flags = G.ext.flags.length > 0 ? G.ext.flags.join(', ') : (isFr() ? 'symptômes généraux' : 'general symptoms');
+  const catLabel = CATS[G.lang]?.find(c=>c.id===cat)?.label || cat;
+  document.getElementById('res-obs').innerHTML =
+    `<b>${t('obs-plainte')} :</b> ${catLabel}<br>
+     <b>${t('obs-dur')} :</b> ${dur}<br>
+     <b>${t('obs-int')} :</b> ${int}<br>
+     <b>${t('obs-flags')} :</b> ${flags}`;
+
+  // XGBoost — prédiction séjour (utilise le premier hôpital éligible)
+  const hospRef = HOPITAUX.find(h=>h.type==='urgence') || HOPITAUX[0];
+  const sejour  = predictSejour(ctas, cat, hospRef);
+  document.getElementById('sejour-wrap').innerHTML = `
+    <div class="sejour-total">
+      <div>
+        <div class="sejour-total-lbl">${t('sejour-total')}</div>
+        <div style="font-size:.73rem;color:#90CAF9;margin-top:2px">CTAS ${ctas} · ${catLabel}</div>
+      </div>
+      <div class="sejour-total-val">${fmtMin(sejour.total)}</div>
+    </div>
+    <div class="sejour-detail">
+      <div class="sejour-item"><div class="sejour-item-val">${fmtMin(sejour.attente)}</div><div class="sejour-item-lbl">${t('sejour-attente')}</div></div>
+      <div class="sejour-item"><div class="sejour-item-val">${fmtMin(sejour.consult)}</div><div class="sejour-item-lbl">${t('sejour-consult')}</div></div>
+      <div class="sejour-item"><div class="sejour-item-val">${fmtMin(sejour.examens)}</div><div class="sejour-item-lbl">${t('sejour-examens')}</div></div>
+    </div>
+    <div class="sejour-conf">${t('conf-label')} : ${sejour.conf}%</div>`;
+
+  // Recommandations traitement
+  const treats = TREAT_DATA[cat] || [
+    {ico:'🏥',t:{fr:'Consultation recommandée',en:'Consultation recommended'},d:{fr:'Un professionnel évaluera votre situation.',en:'A professional will evaluate your situation.'}},
+    {ico:'📋',t:{fr:'Préparez vos informations',en:'Prepare your information'},d:{fr:'Notez vos symptômes, médicaments et allergies.',en:'Note your symptoms, medications and allergies.'}},
+  ];
+  document.getElementById('treat-list').innerHTML = treats.map(r=>`
+    <div class="treat-item">
+      <div class="treat-ico-wrap">${r.ico}</div>
+      <div><div class="treat-title">${isFr()?r.t.fr:r.t.en}</div><div class="treat-desc">${isFr()?r.d.fr:r.d.en}</div></div>
+    </div>`).join('');
+
+  // Recommandations hôpitaux
+  const eligible = HOPITAUX.filter(h => (CTAS_FILTER[h.type]||[]).includes(ctas));
+  // Trier par score pondéré : 40% attente + 35% taux occupation + 25% distance
+  eligible.forEach(h => {
+    const achal = getAchalandage(h);
+    const normAtt = 1 - Math.min(achal.taux, 120)/120;
+    const normOcc = 1 - Math.min(achal.mult, 2)/2;
+    const normDist = h.dist > 0 ? Math.max(0, 1 - h.dist/20) : 1;
+    h._score = 0.40*normAtt + 0.35*normOcc + 0.25*normDist;
+  });
+  eligible.sort((a,b) => b._score - a._score);
+  const top3 = eligible.slice(0,3);
+
+  const recoEl = document.getElementById('reco-list');
+  recoEl.innerHTML = '';
+  top3.forEach((h, i) => {
+    const achal = getAchalandage(h);
+    const pill  = TYPE_PILL[h.type] || {bg:'#F5F5F5',c:'#424242',fr:h.type,en:h.type};
+    const pLabel= isFr() ? pill.fr : pill.en;
+    const dist  = h.dist > 0 ? `${h.dist} km` : (isFr()?'En ligne':'Online');
+    const sejH  = predictSejour(ctas, cat, h);
+    const card  = document.createElement('div');
+    card.className = 'reco-card' + (i===0?' top':'');
+    card.innerHTML = `
+      ${i===0?`<div class="top-badge">⭐ ${t('best')}</div>`:''}
+      <span class="type-pill" style="background:${pill.bg};color:${pill.c}">${pLabel}</span>
+      <span class="achal-badge ${achal.cls}" style="margin-left:6px">${achal.level}</span>
+      <div class="reco-name">${h.nom_full || h.nom}</div>
+      <div class="reco-addr">📍 ${h.addr}</div>
+      <div class="reco-meta">
+        <div class="reco-stat"><div class="reco-dot" style="background:var(--orange)"></div>${achal.taux} min</div>
+        <div class="reco-stat"><div class="reco-dot" style="background:var(--blue)"></div>${dist}</div>
+        <div class="reco-stat"><div class="reco-dot" style="background:var(--green)"></div>Séjour ~${fmtMin(sejH.total)}</div>
+      </div>
+      <div class="reco-score-bar"><div class="reco-score-fill" style="width:${Math.round(h._score*100)}%"></div></div>
+      <div class="reco-hint">🔍 ${t('open-detail')}</div>`;
+    card.onclick = () => openOverlay(h, ctas, cat);
+    recoEl.appendChild(card);
+  });
+
+  // Probabilités CTAS
+  const pbEl = document.getElementById('proba-bars');
+  pbEl.innerHTML = '';
+  Object.entries(sc.p).forEach(([n,p])=>{
+    const pct=Math.round(p*100);
+    pbEl.innerHTML+=`<div class="proba-row">
+      <div class="proba-lbl" style="color:${CBAR[n]}">CTAS ${n}</div>
+      <div class="proba-track"><div class="proba-fill" style="width:${pct}%;background:${CBAR[n]}"></div></div>
+      <div class="proba-pct">${pct}%</div></div>`;
+  });
+
+  // Détails tech
+  document.getElementById('tech-details').innerHTML = `
+    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border2);font-size:.79rem"><span style="color:var(--muted)">Catégorie</span><span style="font-family:monospace;font-weight:700">${catLabel}</span></div>
+    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border2);font-size:.79rem"><span style="color:var(--muted)">CTAS</span><span style="font-family:monospace;font-weight:700;color:${CBAR[ctas]}">CTAS ${ctas}</span></div>
+    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border2);font-size:.79rem"><span style="color:var(--muted)">${t('obs-int')}</span><span style="font-family:monospace;font-weight:700">${int}</span></div>
+    <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:.79rem"><span style="color:var(--muted)">${t('obs-dur')}</span><span style="font-family:monospace;font-weight:700">${dur}</span></div>`;
+}
+
+function toggleTech(){
+  document.getElementById('tech-body').classList.toggle('on');
+  document.getElementById('tech-arrow').textContent=document.getElementById('tech-body').classList.contains('on')?'▲':'▼';
+}
+
+// ════════════════════════════════════════════════════════════
+//  OVERLAY HÔPITAL
+// ════════════════════════════════════════════════════════════
+function openOverlay(h, ctas, cat) {
+  const achal = getAchalandage(h);
+  const sejour= predictSejour(ctas, cat, h);
+  const bars  = getAchalBar(h);
+  const now   = new Date().getHours();
+  const pill  = TYPE_PILL[h.type] || {bg:'#F5F5F5',c:'#424242',fr:h.type,en:h.type};
+
+  document.getElementById('ov-name').textContent = h.nom_full || h.nom;
+  document.getElementById('ov-addr').textContent = `📍 ${h.addr}`;
+
+  const maxBar = Math.max(...bars, 1);
+  const barHtml = bars.map((v,i) => {
+    const pct = Math.round((v/maxBar)*100);
+    const isNow = i === now;
+    const col = v < 80 ? '#66BB6A' : v < 130 ? '#FFA726' : '#EF5350';
+    return `<div class="achal-bar" style="height:${pct}%;background:${col};${isNow?'outline:2px solid var(--blue-dp);outline-offset:1px':''}"></div>`;
+  }).join('');
+  const hoursLabel = Array.from({length:24},(_,i)=>i%6===0?`${i}h`:'').join('');
+
+  document.getElementById('ov-content').innerHTML = `
+    <!-- Métriques rapides -->
+    <div class="hosp-section">
+      <div class="hosp-sec-title">Métriques actuelles</div>
+      <div class="hosp-grid">
+        <div class="hosp-stat"><div class="hosp-stat-val">${achal.taux} min</div><div class="hosp-stat-lbl">Attente estimée</div></div>
+        <div class="hosp-stat"><div class="hosp-stat-val">${h.dist > 0 ? h.dist+' km' : '—'}</div><div class="hosp-stat-lbl">Distance</div></div>
+        <div class="hosp-stat"><div class="hosp-stat-val"><span class="achal-badge ${achal.cls}">${achal.level}</span></div><div class="hosp-stat-lbl">Achalandage</div></div>
+        <div class="hosp-stat"><div class="hosp-stat-val">${fmtMin(sejour.total)}</div><div class="hosp-stat-lbl">Séjour estimé</div></div>
+      </div>
+    </div>
+
+    <!-- Prédiction XGBoost -->
+    <div class="hosp-section">
+      <div class="hosp-sec-title">⏱️ ${t('ov-sejour')}</div>
+      <div class="hosp-sejour">
+        <div class="hosp-sejour-title">${t('ov-total')}</div>
+        <div class="hosp-sejour-total">${fmtMin(sejour.total)}</div>
+        <div class="hosp-sejour-detail">
+          <div class="hosp-sejour-item"><div class="hosp-sejour-item-val">${fmtMin(sejour.attente)}</div><div class="hosp-sejour-item-lbl">${t('ov-attente')}</div></div>
+          <div class="hosp-sejour-item"><div class="hosp-sejour-item-val">${fmtMin(sejour.consult)}</div><div class="hosp-sejour-item-lbl">${t('ov-consult')}</div></div>
+          <div class="hosp-sejour-item"><div class="hosp-sejour-item-val">${fmtMin(sejour.examens)}</div><div class="hosp-sejour-item-lbl">${t('ov-examens')}</div></div>
+        </div>
+      </div>
+      <div style="font-size:.74rem;color:var(--muted);margin-top:6px;font-family:monospace">
+        ${t('conf-label')} : ${sejour.conf}% · CTAS ${ctas} · ${CATS[G.lang]?.find(c=>c.id===cat)?.label||cat}
+      </div>
+    </div>
+
+    <!-- Achalandage 24h -->
+    <div class="hosp-section">
+      <div class="hosp-sec-title">📊 ${t('ov-achal')}</div>
+      <div class="achal-chart">${barHtml}</div>
+      <div class="achal-hours">
+        <span>0h</span><span>6h</span><span>12h</span><span>18h</span><span>23h</span>
+      </div>
+      <div style="font-size:.73rem;color:var(--muted);margin-top:6px">
+        ▲ Maintenant (${now}h) · Simulation basée sur les tendances MSSS
+      </div>
+    </div>
+
+    <!-- Spécialisations -->
+    <div class="hosp-section">
+      <div class="hosp-sec-title">🏥 ${t('ov-specs')}</div>
+      <div class="spec-list">${h.specs.map(s=>`<span class="spec-tag">${s}</span>`).join('')}</div>
+    </div>
+
+    <!-- Heures d'ouverture -->
+    <div class="hosp-section" style="margin-bottom:0">
+      <div class="hosp-sec-title">🕐 ${t('ov-hours')}</div>
+      <div style="font-size:.87rem;color:var(--text);font-weight:600">${h.heures}</div>
+    </div>`;
+
+  document.getElementById('overlay').classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeOverlay(e) {
+  if (e.target === document.getElementById('overlay')) closeOverlayBtn();
+}
+function closeOverlayBtn() {
+  document.getElementById('overlay').classList.remove('on');
+  document.body.style.overflow = '';
+}
+
+// ════════════════════════════════════════════════════════════
+//  RESET
+// ════════════════════════════════════════════════════════════
+function reset() {
+  G.pourSoi=null; G.qlSel=[]; G.showAlert=false;
+  G.hist=[]; G.chatReady=false; G.waiting=false;
+  G.ageGroup=null; G.sexe=null;
+  G.ext={cat:'',pid:'',ctasOverride:null,intensite:null,duree:'',flags:[]};
+  G.vitaux={spo2:'',tension:'',fc:'',temp:'',glyc:''};
+  G.localisation={lat:null,lon:null,codePostal:'',source:''};
+  document.getElementById('c-moi').classList.remove('sel');
+  document.getElementById('c-autre').classList.remove('sel');
+  document.getElementById('s1-next').disabled = true;
+  document.getElementById('chat-msgs').innerHTML = '';
+  document.getElementById('loc-input').value = '';
+  document.getElementById('loc-status').textContent = '';
+  document.getElementById('crit-alert').classList.remove('on');
+  go(0);
+}
+
+// ── INIT ──
+updProg(0);
+</script>
+</body>
+</html>

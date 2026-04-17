@@ -1,0 +1,33 @@
+# Clés API — ne jamais committer
+.env
+.env.local
+*.key
+secrets.json
+config.local.js
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+env/
+venv/
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Versions anciennes du prototype
+triageai_v*.html
+triageai_v*.jsx
+triageai_prototype.html
+
+# Fichiers temporaires
+*.tmp
+*.log
