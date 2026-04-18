@@ -2,7 +2,7 @@
 
 **Le bon soin, au bon endroit, au bon moment.**
 
-Système d'orientation intelligent pour les urgences de Montréal — Projet académique TECH 60711 H2026, Université de Montréal.
+Système d'orientation intelligent pour les urgences de Montréal — Projet académique TECH 60711 H2026, HEC Montréal.
 
 ## Description
 
