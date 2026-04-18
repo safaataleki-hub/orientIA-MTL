@@ -70,4 +70,4 @@ En cas d'urgence, appelez le **911**. Pour Info-Santé, appelez le **811**.
 
 ---
 
-*TECH 60711 H2026 · Université de Montréal · MSc Transformation Numérique*
+*TECH 60711 H2026 · HEC Montréal · MSc Transformation Numérique*
