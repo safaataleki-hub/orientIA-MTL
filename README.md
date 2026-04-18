@@ -2,7 +2,7 @@
 
 **Le bon soin, au bon endroit, au bon moment.**
 
-Système d'orientation intelligent pour les urgences de Montréal — Projet académique TECH 60711 H2026, HEC Montréal.
+Système d'orientation intelligent pour les urgences de Montréal, Projet académique TECH 60711 H2026, HEC Montréal.
 
 ## Description
 
@@ -70,4 +70,3 @@ En cas d'urgence, appelez le **911**. Pour Info-Santé, appelez le **811**.
 
 ---
 
-*TECH 60711 H2026 · HEC Montréal · MSc Transformation Numérique*
